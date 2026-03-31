@@ -1,0 +1,141 @@
+Windows Forensics – File System, Execution & Data Recovery
+
+File System Basics:
+
+File System:
+	•	Organizes raw disk bits into meaningful data
+	•	Defines how files are stored, accessed, and interpreted
+
+
+⸻
+
+FAT File System:
+
+Structure:
+	•	Clusters → Smallest storage unit (file = group of clusters)
+	•	Directory → Stores file name, start cluster, size
+	•	FAT Table → Linked list of clusters (file chain mapping)
+
+Variants:
+	•	FAT12 → 12-bit, very small (32MB)
+	•	FAT16 → 16-bit, up to 2GB
+	•	FAT32 → 28-bit, up to 2TB
+
+Limitations:
+	•	Max file size: 4GB
+	•	No security or permissions
+
+
+⸻
+
+exFAT:
+
+•	Designed to replace FAT32 limitations
+•	Supports very large files and volumes (up to 128PB)
+•	Used in modern USB drives, SD cards
+•	Lightweight (no heavy NTFS features)
+
+
+⸻
+
+NTFS File System:
+
+Features:
+	•	Journaling → $LogFile tracks changes
+	•	Access Control → File permissions per user
+	•	Volume Shadow Copy → File version recovery
+	•	Alternate Data Streams → Hidden data in files
+
+Core Structure:
+	•	MFT (Master File Table) → Database of all files
+
+Key Artifacts:
+	•	$MFT → File records and metadata
+	•	$LogFile → File system transactions
+	•	$UsnJrnl → File change history (timeline)
+
+
+⸻
+
+Deleted Files & Recovery:
+
+Deletion Behavior:
+	•	File system removes metadata (not actual data)
+	•	Data remains until overwritten
+
+Disk Image:
+	•	Bit-by-bit copy of storage device
+	•	Preserves metadata and evidence
+	•	Used for safe forensic analysis
+
+Recovery:
+	•	Deleted files can be recovered from unallocated space
+	•	Tools identify file signatures automatically
+
+
+⸻
+
+Execution Artifacts (File System):
+
+Prefetch:
+	•	Location: C:\Windows\Prefetch
+	•	Stores:
+		- Last run time
+		- Run count
+		- Files used
+	•	Strong evidence of execution
+
+Windows Timeline:
+	•	Location: C:\Users\<user>\AppData\Local\ConnectedDevicesPlatform\...\ActivitiesCache.db
+	•	Stores:
+		- Applications used
+		- File activity
+		- Usage duration
+
+Jump Lists:
+	•	Location: C:\Users\<user>\AppData\Roaming\Microsoft\Windows\Recent\AutomaticDestinations
+	•	Stores:
+		- Recent files per application
+		- Execution timestamps
+
+Shortcut Files (.lnk):
+	•	Location:
+		- C:\Users\<user>\AppData\Roaming\Microsoft\Windows\Recent\
+		- C:\Users\<user>\AppData\Roaming\Microsoft\Office\Recent\
+	•	Stores:
+		- File path
+		- Creation → first access
+		- Modified → last access
+
+IE/Edge WebCache:
+	•	Location: C:\Users\<user>\AppData\Local\Microsoft\Windows\WebCache\WebCacheV*.dat
+	•	Stores:
+		- Browsing history
+		- Local file access (file:// paths)
+
+
+⸻
+
+USB & Device Artifacts:
+
+SetupAPI Logs:
+	•	Location: C:\Windows\inf\setupapi.dev.log
+	•	Stores:
+		- Device ID
+		- Serial number
+		- First connection time
+		- Last connection time
+
+Shortcut Files (.lnk):
+	•	Can reveal USB volume name, type, serial number
+
+
+⸻
+
+Key Notes:
+
+•	FAT → simple, no security
+•	NTFS → advanced, forensic-rich
+•	MFT = central database of files
+•	Deleted ≠ erased (recoverable until overwritten)
+•	Combine multiple artifacts for accurate timeline

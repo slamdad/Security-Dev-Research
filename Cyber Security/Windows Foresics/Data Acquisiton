@@ -1,67 +1,141 @@
-Windows Registry Acquisition & Analysis Tools
+Windows Forensics Tools (Acquisition & Analysis)
+
+Registry Acquisition & Analysis Tools
 
 KAPE (Kroll Artifact Parser and Extractor)
-	•	Purpose: Live data acquisition and triage
-	•	Use: Quickly collect registry hives and forensic artifacts from a live system
+	•	Purpose: Live data acquisition and triage  
+	•	Use: Collect registry hives and forensic artifacts from live systems  
 	•	Features:
-	•	Fast targeted data collection
-	•	CLI and GUI support
-	•	Useful for incident response
-
-Autopsy
-	•	Purpose: Digital forensics analysis (GUI-based)
-	•	Use: Extract registry files from disk images or live data sources
-	•	Features:
-	•	User-friendly interface
-	•	File system navigation and extraction
-	•	Supports multiple data sources
+	•	Fast targeted collection  
+	•	CLI and GUI support  
+	•	Useful for incident response  
 
 FTK Imager
-	•	Purpose: Data acquisition and file extraction
-	•	Use: Mount disk images or access live systems to export registry files
+	•	Purpose: Data acquisition and file extraction  
+	•	Use: Mount disk images or extract files from live systems  
 	•	Features:
-	•	Mount and browse disk images
-	•	Export registry hives
-	•	“Obtain Protected Files” for live systems
-	•	Limitation: Does not extract Amcache.hve
-
-⸻
-
-Registry Analysis Tools
+	•	Mount and browse disk images  
+	•	Export registry hives and files  
+	•	“Obtain Protected Files” for live systems  
+	•	Limitation: Does not extract Amcache.hve  
 
 Registry Viewer (AccessData)
-	•	Purpose: View extracted registry hives
-	•	Use: Open and analyze registry hives similar to Windows Registry Editor
+	•	Purpose: View registry hives  
+	•	Use: Analyze extracted registry files  
 	•	Features:
-	•	Familiar UI (similar to regedit)
-	•	Simple hive navigation
-	•	Limitations:
-	•	Loads only one hive at a time
-	•	Does not process transaction logs
+	•	Simple UI (similar to regedit)  
+	•	Single hive loading  
+	•	Limitation: No transaction log support  
 
 Registry Explorer (Eric Zimmerman)
-	•	Purpose: Advanced registry analysis
-	•	Use: Analyze multiple registry hives with enhanced accuracy
+	•	Purpose: Advanced registry analysis  
+	•	Use: Analyze multiple hives with higher accuracy  
 	•	Features:
-	•	Load multiple hives simultaneously
-	•	Incorporates transaction logs for updated data
-	•	Bookmark feature for commonly investigated keys
-	•	Part of a DFIR-focused toolset
+	•	Loads multiple hives  
+	•	Incorporates transaction logs  
+	•	Bookmark feature for key artifacts  
 
 RegRipper
-	•	Purpose: Automated registry data extraction
-	•	Use: Generate reports from registry hives
+	•	Purpose: Automated registry parsing  
+	•	Use: Extract forensic data from registry hives  
 	•	Features:
-	•	Extracts data from important forensic keys/values
-	•	Outputs results in structured text reports
-	•	Available in CLI and GUI
-	•	Limitation:
-	•	Does not process transaction logs
-	•	Best used after merging logs (e.g., with Registry Explorer)
+	•	Generates structured reports  
+	•	CLI and GUI support  
+	•	Limitation: No transaction log support  
 
-⸻
+---
 
-Note
-	•	Registry Editor cannot load exported hives
-	•	Use dedicated tools for accurate offline analysis
-	•	Combining tools (e.g., Registry Explorer + RegRipper) improves results
+File System & Data Recovery Tools
+
+Autopsy
+	•	Purpose: Disk image analysis and recovery  
+	•	Use: Analyze disk images, recover deleted files, parse artifacts  
+	•	Features:
+	•	GUI-based forensic suite  
+	•	Supports multiple data sources  
+	•	Parses browser history and system artifacts  
+
+MFTECmd (Eric Zimmerman)
+	•	Purpose: NTFS artifact parsing  
+	•	Use: Parse $MFT, $Boot, and $UsnJrnl  
+	•	Features:
+	•	Outputs CSV/JSON  
+	•	Extracts file metadata and timestamps  
+	•	CLI-based  
+
+EZViewer (Eric Zimmerman)
+	•	Purpose: Visualization tool  
+	•	Use: View output from EZ tools (CSV data)  
+	•	Features:
+	•	Clean interface  
+	•	Simplifies analysis  
+
+Hex Editors (Generic)
+	•	Purpose: Raw data inspection  
+	•	Use: Analyze binary data and recover file signatures  
+	•	Features:
+	•	View hex/binary data  
+	•	Manual file carving support  
+
+Disk Imaging Tools
+
+	•	Purpose: Create forensic disk images  
+	•	Use: Bit-by-bit copy of storage devices  
+	•	Examples:
+	•	FTK Imager  
+	•	dd (Linux)  
+	•	Features:
+	•	Preserves original evidence  
+	•	Enables offline analysis  
+
+---
+
+Execution & User Activity Artifact Tools
+
+PECmd (Eric Zimmerman)
+	•	Purpose: Parse Windows Prefetch files  
+	•	Use: Extract execution evidence from .pf files  
+	•	Features:
+	•	Shows run count and last execution  
+	•	Supports directory parsing  
+	•	Outputs CSV/JSON  
+
+WxTCmd (Eric Zimmerman)
+	•	Purpose: Parse Windows Timeline  
+	•	Use: Extract user activity from ActivitiesCache.db  
+	•	Features:
+	•	SQLite parsing  
+	•	Outputs CSV  
+	•	Shows app usage and duration  
+
+JLECmd (Eric Zimmerman)
+	•	Purpose: Parse Jump Lists  
+	•	Use: Extract recent file and application usage  
+	•	Features:
+	•	Supports multiple formats  
+	•	Outputs CSV/JSON/HTML  
+	•	Provides execution timestamps  
+
+LECmd (Eric Zimmerman)
+	•	Purpose: Parse shortcut (.lnk) files  
+	•	Use: Extract file access and execution data  
+	•	Features:
+	•	Shows file paths and timestamps  
+	•	Supports directory parsing  
+	•	Outputs CSV/JSON/XML  
+
+WebCache Analysis Tools
+
+	•	Purpose: Parse IE/Edge WebCache database  
+	•	Use: Extract browsing and local file access history  
+	•	Examples:
+	•	Autopsy  
+	•	ESE database parsers  
+
+---
+
+Notes
+
+	•	Use dedicated tools instead of native Windows tools for forensic accuracy  
+	•	Combine multiple artifacts/tools for reliable conclusions  
+	•	Prefer offline analysis on acquired images over live systems
