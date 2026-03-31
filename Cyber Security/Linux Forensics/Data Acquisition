@@ -1,0 +1,45 @@
+dd
+•	Purpose: Bit-by-bit disk imaging
+•	Type: CLI
+•	Notes: Basic tool, no built-in forensic safeguards
+
+dc3dd
+•	Purpose: Enhanced forensic imaging
+•	Type: CLI
+•	Notes:
+•	Built-in hashing (MD5/SHA)
+•	Error handling and logging
+•	Preferred over dd for forensics
+
+Guymager
+•	Purpose: GUI-based disk imaging
+•	Type: GUI
+•	Notes:
+•	Supports E01, AFF, RAW formats
+•	Built-in hashing and logging
+•	Fast and easy to use
+
+    ---Cross Platform---
+
+The Sleuth Kit (TSK)
+•	Purpose: Disk image analysis
+•	Type: CLI
+•	Notes:
+•	Supports FAT, NTFS, EXT
+•	Tools: fls, icat, tsk_recover
+•	Ideal for scripting
+
+Autopsy
+•	Purpose: GUI disk analysis
+•	Type: GUI
+•	Notes:
+•	Frontend for TSK
+•	Timeline, keyword search, carving
+•	Supports plugins
+
+Bulk Extractor
+•	Purpose: Data extraction
+•	Type: CLI
+•	Notes:
+•	Extracts emails, URLs, patterns
+•	Works without file system parsing

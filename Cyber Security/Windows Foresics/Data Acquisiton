@@ -139,3 +139,27 @@ Notes
 	•	Use dedicated tools instead of native Windows tools for forensic accuracy  
 	•	Combine multiple artifacts/tools for reliable conclusions  
 	•	Prefer offline analysis on acquired images over live systems
+
+
+EnCase Forensic
+	•	Purpose: Full forensic suite
+	•	Type: GUI
+	•	Notes:
+	•	Case management
+	•	Court-admissible reporting
+	•	Widely used in law enforcement
+
+Magnet AXIOM
+•	Purpose: Evidence correlation and analysis
+•	Type: GUI
+•	Notes:
+•	Supports computer, mobile, cloud
+•	Timeline-based analysis
+•	Automated artifact extraction
+
+X-Ways Forensics
+•	Purpose: Advanced forensic analysis
+•	Type: GUI
+•	Notes:
+•	Lightweight alternative to EnCase
+•	Strong disk and file analysis
