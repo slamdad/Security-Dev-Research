@@ -1,0 +1,128 @@
+⸻
+
+Windows Registry Forensics (Clean Notes)
+
+1. Accessing the Registry
+
+Online (Live System)
+
+Use regedit.exe
+	•	HKEY_CURRENT_USER (HKCU)
+Current logged-in user’s settings (preferences, recent activity, software configs)
+	•	HKEY_USERS (HKU)
+Contains all user profiles loaded on the system
+(includes HKCU as a subset)
+	•	HKEY_LOCAL_MACHINE (HKLM)
+System-wide configuration (hardware, OS, installed software)
+	•	HKEY_CLASSES_ROOT (HKCR)
+File associations and COM objects
+Combined view of:
+	•	HKLM\Software\Classes (system-wide)
+	•	HKCU\Software\Classes (user-specific)
+Priority: HKCU overrides HKLM
+	•	HKEY_CURRENT_CONFIG (HKCC)
+Current hardware profile (derived from SYSTEM hive)
+
+⸻
+
+2. Offline Registry Hives
+
+Location:
+C:\Windows\System32\Config\
+
+Hive File	Mounted As	Description
+DEFAULT	HKU.DEFAULT	Default user profile (logon screen settings)
+SAM	HKLM\SAM	User accounts & password hashes
+SECURITY	HKLM\SECURITY	Local security policies
+SOFTWARE	HKLM\SOFTWARE	Installed applications & OS config
+SYSTEM	HKLM\SYSTEM	Boot config, services, drivers
+
+
+⸻
+
+3. User-Specific Hives
+
+Location:
+C:\Users\<username>\
+	•	NTUSER.DAT
+→ Mounted as HKCU when user logs in
+→ Contains user activity, MRUs, preferences
+	•	USRCLASS.DAT
+→ Mounted as HKCU\Software\Classes
+→ Path:
+C:\Users\<username>\AppData\Local\Microsoft\Windows\
+→ Stores file associations & shell info
+
+Note: Both are hidden files.
+
+⸻
+
+4. AmCache Hive (Execution Artifacts)
+
+Location:
+C:\Windows\AppCompat\Programs\Amcache.hve
+	•	Stores metadata about executed programs
+	•	Includes:
+	•	File paths
+	•	Execution timestamps
+	•	SHA1 hashes (partial)
+	•	Useful for program execution evidence, even if deleted
+
+⸻
+
+5. Transaction Logs
+
+Files:
+	•	.LOG
+	•	.LOG1
+	•	.LOG2
+
+Location:
+C:\Windows\System32\Config\
+	•	Act as a journal of registry changes
+	•	May contain recent changes not yet committed
+	•	Important for timeline reconstruction
+
+Example:
+	•	SYSTEM.LOG1
+	•	SOFTWARE.LOG2
+
+⸻
+
+6. Registry Backups (RegBack)
+
+Location:
+C:\Windows\System32\Config\RegBack\
+	•	Backup copies of registry hives
+	•	Represent older system states
+	•	Useful for:
+	•	Recovering deleted keys
+	•	Comparing historical changes
+
+Important Note:
+On newer Windows versions (Windows 10 1803+), RegBack may be disabled by default (files may be 0 KB unless manually enabled).
+
+⸻
+
+7. Key Forensic Insight
+	•	Transaction Logs → Recent activity (volatile changes)
+	•	Active Hives → Current state
+	•	RegBack → Historical state
+
+👉 Combine all three for full timeline reconstruction.
+
+⸻
+
+8. Quick Forensic Tips
+	•	Always work on copies, never original hives
+	•	Use tools:
+	•	Registry Explorer (Eric Zimmerman)
+	•	RegRipper
+	•	Autopsy
+	•	Focus on:
+	•	Run / RunOnce keys (persistence)
+	•	RecentDocs, TypedPaths (user activity)
+	•	Services & Drivers (SYSTEM hive)
+	•	Installed software (SOFTWARE hive)
+
+⸻
