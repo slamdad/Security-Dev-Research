@@ -1,128 +1,211 @@
-⸻
+Windows Registry Forensics
 
-Windows Registry Forensics (Clean Notes)
+	windows Registry:
 
-1. Accessing the Registry
+		Access online -> regedit.exe
 
-Online (Live System)
+			* HKEY_CURRENT_USER -> Current User Settings and data.
+			* HKEY_USERS -> All Users Settings and data.
+			* HKEY_LOCAL_MACHINE -> Contains computer related setting and data for a user.
+			* HKEY_CLASSES_ROOT -> Configures Windows Explorer as the way it is also is a combined view of file associations from:
+				•	HKLM\Software\Classes (system-wide defaults)
+				•	HKCU\Software\Classes (user-specific overrides)
+				👉 If a setting exists in both, HKCU (user) takes priority; otherwise it uses HKLM.
+			* HKEY_CURRENT_CONFIG -> Contains hardware system startup settings.
 
-Use regedit.exe
-	•	HKEY_CURRENT_USER (HKCU)
-Current logged-in user’s settings (preferences, recent activity, software configs)
-	•	HKEY_USERS (HKU)
-Contains all user profiles loaded on the system
-(includes HKCU as a subset)
-	•	HKEY_LOCAL_MACHINE (HKLM)
-System-wide configuration (hardware, OS, installed software)
-	•	HKEY_CLASSES_ROOT (HKCR)
-File associations and COM objects
-Combined view of:
-	•	HKLM\Software\Classes (system-wide)
-	•	HKCU\Software\Classes (user-specific)
-Priority: HKCU overrides HKLM
-	•	HKEY_CURRENT_CONFIG (HKCC)
-Current hardware profile (derived from SYSTEM hive)
+		Access offline -> C:\Windows\System32\Config
 
-⸻
+			*DEFAULT (mounted on HKEY_USERS\DEFAULT)
+			*SAM (mounted on HKEY_LOCAL_MACHINE\SAM)
+			*SECURITY (mounted on HKEY_LOCAL_MACHINE\Security)
+			*SOFTWARE (mounted on HKEY_LOCAL_MACHINE\Software)
+			*SYSTEM (mounted on HKEY_LOCAL_MACHINE\System)
 
-2. Offline Registry Hives
+	Apart from these hives, two other hives containing user information can be found in the User profile directory. For Windows 7 and above, a user’s profile directory is located in C:\Users\<username>\ where the hives are:
 
-Location:
-C:\Windows\System32\Config\
+		* NTUSER.DAT (mounted on HKEY_CURRENT_USER when a user logs in)
+		* USRCLASS.DAT (mounted on HKEY_CURRENT_USER\Software\CLASSES) -> located in the directory C:\Users\<username>\AppData\Local\Microsoft\Windows
 
-Hive File	Mounted As	Description
-DEFAULT	HKU.DEFAULT	Default user profile (logon screen settings)
-SAM	HKLM\SAM	User accounts & password hashes
-SECURITY	HKLM\SECURITY	Local security policies
-SOFTWARE	HKLM\SOFTWARE	Installed applications & OS config
-SYSTEM	HKLM\SYSTEM	Boot config, services, drivers
+							---Both are hidden files---
 
+	Apart from these files, there is another very important hive called the AmCache hive. This hive is located in C:\Windows\AppCompat\Programs\Amcache.hve. Windows creates this hive to save information on programs that were recently run on the system.
 
-⸻
+	Transaction Logs (.LOG, .LOG1, .LOG2)
+		•	Act as a journal of registry changes
+		•	May contain latest updates not yet written to hives
+		•	Stored in: C:\Windows\System32\Config\
+		•	Example: SAM.LOG
 
-3. User-Specific Hives
+	Registry Backups (RegBack)
+		•	Copies of registry hives (older state)
+		•	Stored in: C:\Windows\System32\Config\RegBack\
+		•	Typically created every ~10 days
+		•	Useful to recover deleted or modified keys
+ 	
+	👉 Use logs for recent changes, backups for previous states
 
-Location:
-C:\Users\<username>\
-	•	NTUSER.DAT
-→ Mounted as HKCU when user logs in
-→ Contains user activity, MRUs, preferences
-	•	USRCLASS.DAT
-→ Mounted as HKCU\Software\Classes
-→ Path:
-C:\Users\<username>\AppData\Local\Microsoft\Windows\
-→ Stores file associations & shell info
+OS Information:
+	•	Used to identify Windows version
+	•	Useful for compatibility and attack surface analysis
+	Location:
+		SOFTWARE\Microsoft\Windows NT\CurrentVersion
 
-Note: Both are hidden files.
+Control Sets:
+	•	Store system configuration for boot
+	•	CurrentControlSet = active configuration (use this for analysis)
+	Location:
+		SYSTEM\ControlSet001
+		SYSTEM\ControlSet002
+		SYSTEM\CurrentControlSet
+		SYSTEM\Select\Current
+		SYSTEM\Select\LastKnownGood
 
-⸻
+Computer Name:
+	•	Identifies the machine being analyzed
+	Location:
+		SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName
 
-4. AmCache Hive (Execution Artifacts)
+Time Zone Information:
+	•	Required for accurate timeline analysis
+	•	Helps correlate UTC vs local timestamps
+	Location:
+		SYSTEM\CurrentControlSet\Control\TimeZoneInformation
 
-Location:
-C:\Windows\AppCompat\Programs\Amcache.hve
-	•	Stores metadata about executed programs
+Network Interfaces:
+	•	Contains IP, DNS, DHCP, subnet details
+	•	Helps identify system in network
+	Location:
+		SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces
+
+Past Networks:
+	•	Stores previously connected networks
+	•	LastWrite time = last connection
+	Location:
+		SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\Signatures\Unmanaged
+		SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\Signatures\Managed
+
+Autoruns (Persistence):
+	•	Programs executed at user login
+	•	Common persistence mechanism
+	Location:
+		NTUSER.DAT\Software\Microsoft\Windows\CurrentVersion\Run
+		NTUSER.DAT\Software\Microsoft\Windows\CurrentVersion\RunOnce
+		SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+		SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce
+		SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer\Run
+
+Services:
+	•	Background system services
+	•	Start = 0x02 → runs at boot
+	Location:
+		SYSTEM\CurrentControlSet\Services
+
+SAM Hive (User Information):
+	•	Contains user accounts and authentication data
 	•	Includes:
-	•	File paths
-	•	Execution timestamps
-	•	SHA1 hashes (partial)
-	•	Useful for program execution evidence, even if deleted
+		- RID
+		- Login count
+		- Last login
+		- Password details
+		- Group membership
+	Location:
+		SAM\Domains\Account\Users
 
-⸻
+		Recent Files (RecentDocs):
+	•	Tracks recently opened files (MRU order)
+	•	Top entry = most recently used
+	•	Grouped by file extensions (.pdf, .docx, etc.)
+	Location:
+		NTUSER.DAT\Software\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs
+		NTUSER.DAT\...\RecentDocs\.pdf
 
-5. Transaction Logs
+Office Recent Files:
+	•	Tracks files opened in Microsoft Office
+	•	Includes full file paths
+	Location:
+		NTUSER.DAT\Software\Microsoft\Office\<version>\
+		NTUSER.DAT\...\Office\<version>\UserMRU\LiveID_xxx\FileMRU
 
-Files:
-	•	.LOG
-	•	.LOG1
-	•	.LOG2
+ShellBags:
+	•	Stores folder access and structure information
+	•	Can reveal accessed folders (even deleted ones)
+	Location:
+		USRCLASS.DAT\...\Shell\Bags
+		USRCLASS.DAT\...\Shell\BagMRU
+		NTUSER.DAT\...\Shell\Bags
+		NTUSER.DAT\...\Shell\BagMRU
 
-Location:
-C:\Windows\System32\Config\
-	•	Act as a journal of registry changes
-	•	May contain recent changes not yet committed
-	•	Important for timeline reconstruction
+Open/Save Dialog MRUs:
+	•	Tracks files opened/saved through dialog boxes
+	•	Useful for application-level file access tracking
+	Location:
+		NTUSER.DAT\...\Explorer\ComDlg32\OpenSavePIDlMRU
+		NTUSER.DAT\...\Explorer\ComDlg32\LastVisitedPidlMRU
 
-Example:
-	•	SYSTEM.LOG1
-	•	SOFTWARE.LOG2
+Explorer Address/Search:
+	•	Tracks typed paths and search queries
+	•	Shows user navigation and intent
+	Location:
+		NTUSER.DAT\...\Explorer\TypedPaths
+		NTUSER.DAT\...\Explorer\WordWheelQuery
 
-⸻
+👉 MRU = Most Recently Used (top = latest activity)
 
-6. Registry Backups (RegBack)
+UserAssist:
+	•	Tracks GUI-based program execution (via Explorer)
+	•	Stores execution count and last run time
+	•	Entries are ROT13 encoded
+	•	Does NOT track command-line executions
+	Location:
+		NTUSER.DAT\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{GUID}\Count
 
-Location:
-C:\Windows\System32\Config\RegBack\
-	•	Backup copies of registry hives
-	•	Represent older system states
-	•	Useful for:
-	•	Recovering deleted keys
-	•	Comparing historical changes
+ShimCache (AppCompatCache):
+	•	Tracks applications for compatibility purposes
+	•	Stores file name, size, and last modified time
+	•	Does NOT guarantee execution (use with caution)
+	Location:
+		SYSTEM\CurrentControlSet\Control\Session Manager\AppCompatCache
 
-Important Note:
-On newer Windows versions (Windows 10 1803+), RegBack may be disabled by default (files may be 0 KB unless manually enabled).
+AmCache:
+	•	Detailed execution artifact
+	•	Stores execution path, SHA1 hash, timestamps
+	•	Useful for confirming execution
+	Location:
+		C:\Windows\AppCompat\Programs\Amcache.hve
+		Amcache.hve\Root\File\{Volume GUID}\
 
-⸻
+BAM / DAM:
+	•	Tracks background application execution
+	•	Stores full path and last execution time
+	•	Per-user (SID-based)
+	Location:
+		SYSTEM\CurrentControlSet\Services\bam\UserSettings\{SID}
+		SYSTEM\CurrentControlSet\Services\dam\UserSettings\{SID}
 
-7. Key Forensic Insight
-	•	Transaction Logs → Recent activity (volatile changes)
-	•	Active Hives → Current state
-	•	RegBack → Historical state
+👉 Combine multiple artifacts for accurate execution timeline
 
-👉 Combine all three for full timeline reconstruction.
+Device Identification:
+	•	Tracks USB devices connected to system
+	•	Stores Vendor ID, Product ID, Serial Number
+	•	Used to uniquely identify devices
+	Location:
+		SYSTEM\CurrentControlSet\Enum\USBSTOR
+		SYSTEM\CurrentControlSet\Enum\USB
 
-⸻
+Connection Timeline:
+	•	Tracks first, last connection and removal times
+	Location:
+		SYSTEM\CurrentControlSet\Enum\USBSTOR\<Device>\Properties\{83da6326-97a6-4088-9453-a19231573b29}\####
+	
+	Values:
+		0064 → First connection time
+		0066 → Last connection time
+		0067 → Last removal time
 
-8. Quick Forensic Tips
-	•	Always work on copies, never original hives
-	•	Use tools:
-	•	Registry Explorer (Eric Zimmerman)
-	•	RegRipper
-	•	Autopsy
-	•	Focus on:
-	•	Run / RunOnce keys (persistence)
-	•	RecentDocs, TypedPaths (user activity)
-	•	Services & Drivers (SYSTEM hive)
-	•	Installed software (SOFTWARE hive)
+USB Device Name:
+	•	Stores human-readable device name
+	•	Correlate with USBSTOR using GUID/Disk ID
+	Location:
+		SOFTWARE\Microsoft\Windows Portable Devices\Devices
 
-⸻
+👉 Combine all keys to reconstruct USB usage timeline

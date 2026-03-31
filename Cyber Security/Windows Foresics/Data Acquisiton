@@ -1,0 +1,67 @@
+Windows Registry Acquisition & Analysis Tools
+
+KAPE (Kroll Artifact Parser and Extractor)
+	•	Purpose: Live data acquisition and triage
+	•	Use: Quickly collect registry hives and forensic artifacts from a live system
+	•	Features:
+	•	Fast targeted data collection
+	•	CLI and GUI support
+	•	Useful for incident response
+
+Autopsy
+	•	Purpose: Digital forensics analysis (GUI-based)
+	•	Use: Extract registry files from disk images or live data sources
+	•	Features:
+	•	User-friendly interface
+	•	File system navigation and extraction
+	•	Supports multiple data sources
+
+FTK Imager
+	•	Purpose: Data acquisition and file extraction
+	•	Use: Mount disk images or access live systems to export registry files
+	•	Features:
+	•	Mount and browse disk images
+	•	Export registry hives
+	•	“Obtain Protected Files” for live systems
+	•	Limitation: Does not extract Amcache.hve
+
+⸻
+
+Registry Analysis Tools
+
+Registry Viewer (AccessData)
+	•	Purpose: View extracted registry hives
+	•	Use: Open and analyze registry hives similar to Windows Registry Editor
+	•	Features:
+	•	Familiar UI (similar to regedit)
+	•	Simple hive navigation
+	•	Limitations:
+	•	Loads only one hive at a time
+	•	Does not process transaction logs
+
+Registry Explorer (Eric Zimmerman)
+	•	Purpose: Advanced registry analysis
+	•	Use: Analyze multiple registry hives with enhanced accuracy
+	•	Features:
+	•	Load multiple hives simultaneously
+	•	Incorporates transaction logs for updated data
+	•	Bookmark feature for commonly investigated keys
+	•	Part of a DFIR-focused toolset
+
+RegRipper
+	•	Purpose: Automated registry data extraction
+	•	Use: Generate reports from registry hives
+	•	Features:
+	•	Extracts data from important forensic keys/values
+	•	Outputs results in structured text reports
+	•	Available in CLI and GUI
+	•	Limitation:
+	•	Does not process transaction logs
+	•	Best used after merging logs (e.g., with Registry Explorer)
+
+⸻
+
+Note
+	•	Registry Editor cannot load exported hives
+	•	Use dedicated tools for accurate offline analysis
+	•	Combining tools (e.g., Registry Explorer + RegRipper) improves results
