@@ -1,0 +1,263 @@
+Linux File System Navigation & Text Processing Log
+
+Objective
+
+Consolidated operational log based on analyzed material. Focus: navigating filesystem, locating files, and extracting/analyzing data using core Linux utilities.
+
+⸻
+
+1. File Discovery (find)
+
+Structure
+
+find [path] [options] [expression]
+
+Usage Patterns
+	•	Find by name:
+
+find /home -name "file.txt"
+
+	•	Case-insensitive:
+
+find /home -iname "file.txt"
+
+	•	Find directories:
+
+find / -type d -name "logs"
+
+	•	Find by size:
+
+find / -size +100M
+
+	•	Find and delete:
+
+find /tmp -name "*.tmp" -delete
+
+Insight
+
+Used for filesystem enumeration and targeting files for analysis or cleanup.
+
+⸻
+
+2. Permissions Model (4,2,1 System)
+
+Permission Values
+	•	Read (r) = 4
+	•	Write (w) = 2
+	•	Execute (x) = 1
+
+Structure
+
+Owner | Group | Others
+
+Example
+
+chmod 755 file
+
+→ Owner: rwx (7)
+→ Group: r-x (5)
+→ Others: r-x (5)
+
+Insight
+
+Defines access control during navigation and execution.
+
+⸻
+
+3. Text Searching (grep)
+
+Structure
+
+grep [options] pattern file
+
+Usage Patterns
+	•	Basic search:
+
+grep "error" logfile.txt
+
+	•	Case-insensitive:
+
+grep -i "error" logfile.txt
+
+	•	Recursive:
+
+grep -r "password" /etc
+
+	•	Show line numbers:
+
+grep -n "error" file.txt
+
+	•	Invert match:
+
+grep -v "Port" file
+
+Insight
+
+Primary tool for filtering relevant data from files/logs.
+
+⸻
+
+4. Column Extraction (cut)
+
+Usage Patterns
+	•	By character:
+
+cut -c 1-10 file.txt
+
+	•	By delimiter:
+
+cut -d "," -f 1 file.csv
+
+	•	Multiple fields:
+
+cut -d "," -f 1,2 file.csv
+
+Insight
+
+Used for simple structured extraction, limited compared to awk.
+
+⸻
+
+5. Sorting & Deduplication (sort, uniq)
+
+Usage Patterns
+	•	Sort data:
+
+sort file.txt
+
+	•	Unique values:
+
+sort file.txt | uniq
+
+	•	Count occurrences:
+
+sort file.txt | uniq -c
+
+Insight
+
+Used for pattern detection and frequency analysis.
+
+⸻
+
+6. Structured Processing (awk)
+
+Field-Based Parsing
+
+awk -F: '{ print $1 }' file
+
+Extract Multiple Fields
+
+awk -F: '{ print $1, $7 }' /etc/passwd
+
+Conditional Filtering
+
+awk -F: '$1=="dave" { print $1, $7 }' /etc/passwd
+
+Input Methods
+
+awk -F: '{ print $7 }' /etc/passwd
+
+or
+
+< /etc/passwd awk -F: '{ print $7 }'
+
+Insight
+
+awk acts as:
+	•	filter
+	•	parser
+	•	processor
+
+⸻
+
+7. Text Transformation (sed, tr)
+
+Replace text
+
+sed 's/old/new/' file
+
+Replace globally
+
+sed 's/old/new/g' file
+
+Character translation
+
+tr a o
+
+Insight
+
+Used for modifying and transforming data streams.
+
+⸻
+
+8. Pipeline Architecture
+
+Core Concept
+
+command | command | command
+
+Example Workflow
+
+awk -F: '{ print $7 }' /etc/passwd | sort | uniq -c
+
+Execution Flow
+	1.	Extract shell field
+	2.	Sort values
+	3.	Count occurrences
+
+Output Example
+
+2 /bin/bash
+2 /bin/false
+5 /sbin/nologin
+
+
+⸻
+
+9. Practical Navigation + Analysis Workflow
+
+Example 1: Find and inspect files
+
+find /var/log -name "*.log"
+
+Example 2: Search inside files
+
+grep -i "error" /var/log/syslog
+
+Example 3: Extract structured data
+
+grep dave /etc/passwd | cut -d: -f1,7
+
+Optimized
+
+awk -F: '$1=="dave" { print $1, $7 }' /etc/passwd
+
+
+⸻
+
+10. Advanced Data Pipeline
+
+grep dave /etc/passwd \
+| awk -F: '{ print $1, $7 }' \
+| sort \
+| uniq -c
+
+Purpose
+	•	Filter user
+	•	Extract fields
+	•	Analyze usage
+
+⸻
+
+11. Best Practices
+	•	Avoid unnecessary cat
+
+grep pattern file   # preferred
+
+	•	Use awk over multiple tools when possible
+	•	Always combine:
+
+filter → extract → analyze
+
+
+

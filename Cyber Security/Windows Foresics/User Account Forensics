@@ -1,0 +1,197 @@
+User Account Forensics (Research Notes)
+	•	Focus: tracking user activity, authentication, and account changes across local + domain environments
+	•	Accounts = primary attack surface → used for:
+	•	unauthorized access
+	•	privilege escalation
+	•	persistence
+
+⸻
+
+Types of Accounts (observations)
+	•	Local accounts
+	•	only exist on one machine
+	•	stored in SAM
+	•	weak management → common misconfigs
+	•	Domain accounts
+	•	managed by Domain Controller
+	•	stored in NTDS.dit
+	•	can access multiple systems
+	•	compromise = high impact
+	•	System / Service accounts
+	•	used by OS/services
+	•	often high privilege
+	•	misconfig → easy escalation
+
+⸻
+
+Key Artefacts I should always check
+
+⸻
+
+1. Event Logs (primary evidence)
+
+GUI Path:
+
+Event Viewer → Windows Logs → Security
+
+File Path:
+
+C:\Windows\System32\winevt\Logs\Security.evtx
+
+Important Event IDs:
+	•	4720 → account created
+	•	4722 → account enabled
+	•	4738 → account modified
+	•	4726 → account deleted
+	•	4740 → account locked
+	•	4624 → successful logon
+	•	4625 → failed logon
+
+Gives:
+	•	username + domain
+	•	SID
+	•	source of action
+	•	timestamps
+
+⸻
+
+2. SAM (Local Accounts)
+
+Path:
+
+C:\Windows\System32\Config\SAM
+
+Related hive (needed):
+
+C:\Windows\System32\Config\SYSTEM
+
+Contains:
+	•	local usernames + SIDs
+	•	password hashes
+	•	account status
+	•	last login
+
+Used for:
+	•	offline analysis
+	•	local compromise investigation
+
+⸻
+
+3. NTDS.dit (Domain Accounts)
+
+Path (on Domain Controller):
+
+C:\Windows\NTDS\NTDS.dit
+
+Required for decryption:
+
+C:\Windows\System32\Config\SYSTEM
+
+Export location (example from lab):
+
+C:\Exports\Active Directory\NTDS.dit
+C:\Exports\registry\SYSTEM
+
+Contains:
+	•	domain users
+	•	NTLM password hashes
+	•	group memberships
+	•	login timestamps
+	•	account status
+
+Used for:
+	•	domain compromise
+	•	credential extraction
+	•	lateral movement analysis
+
+⸻
+
+4. Registry Artefacts
+
+Key paths:
+
+HKEY_LOCAL_MACHINE\SYSTEM
+HKEY_CURRENT_USER
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies
+
+Security database:
+
+C:\Windows\security\database\secedit.sdb
+
+Used for:
+	•	user rights assignments
+	•	policy changes
+	•	system/service configs
+
+⸻
+
+5. GPO Artefacts (Domain)
+
+SYSVOL Path:
+
+C:\Windows\SYSVOL\sysvol\
+
+Scripts location (example):
+
+C:\Windows\SYSVOL\sysvol\<domain>\Policies\<GPO_ID>\User\Scripts\Logon
+
+Registry paths affected:
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies
+HKEY_LOCAL_MACHINE\SYSTEM
+
+Network config files:
+
+C:\Windows\System32\drivers\etc
+
+Things to check:
+	•	login scripts
+	•	disabled firewall
+	•	modified user rights
+
+⸻
+
+Tools I would use
+	•	Event Viewer → view logs
+	•	PowerShell
+	•	Get-LocalUser
+	•	Get-ADUser
+	•	DSInternals → extract NTDS.dit data
+	•	ntdsutil → export NTDS + SYSTEM hive
+	•	Registry Explorer → analyse SAM/registry
+	•	Autopsy / FTK → full forensic analysis
+	•	Wireshark → analyse NTLM/Kerberos traffic
+	•	Volatility → memory artefacts
+
+⸻
+
+Key understanding
+	•	SAM → local accounts
+	•	NTDS.dit → domain accounts
+	•	Event logs → timeline
+	•	Registry → supporting evidence
+	•	GPO → persistence + lateral movement
+
+⸻
+
+Important takeaway
+	•	local account compromise → limited impact
+	•	domain account compromise → large impact
+	•	domain controller compromise → full network takeover
+
+⸻
+
+Overall idea
+
+User account forensics = correlating:
+	•	logs
+	•	account databases (SAM / NTDS)
+	•	registry
+	•	GPO artefacts
+
+to answer:
+	•	who did what
+	•	when it happened
+	•	how access was achieved
+
+⸻
