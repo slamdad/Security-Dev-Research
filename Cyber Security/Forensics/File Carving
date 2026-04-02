@@ -1,0 +1,278 @@
+Manual & Automated File Carving — Forensic Log 
+
+
+Date: 2026-04-02
+Section: Manual Carving, Slack Space Analysis, Automated Carving
+Category: Primarily Linux Forensics (with cross-platform DFIR relevance)
+
+⸻
+
+1. Classification
+
+This log falls under:
+	•	Primary: Linux Forensics
+	•	Secondary: Windows Forensics (concepts like NTFS, USB artifacts still apply)
+	•	Domain: Digital Forensics / DFIR (platform-independent core skill)
+
+👉 Reason:
+	•	Tools used: dd, binwalk, foremost, scalpel, exiftool → Linux-based
+	•	Analysis style: raw disk, hex, offsets → OS-agnostic but commonly performed in Linux environments
+
+⸻
+
+2. Objective
+
+To perform:
+	•	Manual file carving using hex-level analysis
+	•	Recovery from formatted media and slack space
+	•	Automated carving using forensic tools
+
+⸻
+
+3. Scenario 1: USB Drive Wipe Recovery (Manual Carving)
+
+3.1 Observations
+	•	Disk image: Challenge1_Manual_Carve_usb.img
+	•	MBR present but partition table empty
+→ Indicates formatted drive
+	•	Residual data still present → recoverable
+
+⸻
+
+3.2 Manual Carving Process
+
+Step 1: Identify Signatures
+	•	Example:
+	•	PNG Header → 89504E47
+	•	PNG Footer → 49454E44AE426082
+
+Step 2: Locate Offsets
+	•	Header offset → 0001069056
+	•	Footer offset → 0001526433
+
+⸻
+
+Step 3: Extract File
+Method 1: Hex Editor
+	•	Select byte range (start → end)
+	•	Save as .png
+
+Method 2: dd (preferred)
+
+dd if=Challenge1_Manual_Carve_usb.img of=Image.png bs=1 skip=<start> count=<size>
+
+Example:
+
+dd if=Challenge1_Manual_Carve_usb.img of=Image.png bs=1 skip=134483968 count=463
+
+
+⸻
+
+Step 4: Verify File
+Using:
+
+exiftool Image.png
+
+Findings:
+	•	Valid PNG file
+	•	Metadata includes:
+	•	Resolution
+	•	Compression
+	•	File timestamps
+
+⸻
+
+3.3 Key Insight
+	•	Formatting ≠ deletion of data
+	•	Data persists until overwritten
+
+⸻
+
+4. Scenario 2: Slack Space Recovery
+
+4.1 Concept: Slack Space
+	•	Unused bytes inside allocated clusters
+	•	Contains residual data from previous files
+
+⸻
+
+4.2 Tool Used: binwalk
+
+binwalk Challenge2_slack_space.img
+
+
+⸻
+
+4.3 Findings
+	•	MPEG transport stream at offset:
+	•	268782594
+	•	Other artifacts:
+	•	MySQL index files
+	•	EXT filesystem fragments
+
+⸻
+
+4.4 Analysis Process
+	1.	Navigate to offset in hex editor
+	2.	Identify signature (e.g., 0x47 for MPEG TS)
+	3.	Confirm file structure
+	4.	Extract using:
+
+binwalk -e Challenge2_slack_space.img
+
+
+⸻
+
+4.5 Output
+	•	Extracted directory:
+
+_Challenge2_slack_space.img.extracted/
+
+
+
+⸻
+
+4.6 Key Insight
+	•	Slack space is valuable for hidden residual evidence
+	•	Fragmentation complicates manual recovery
+
+⸻
+
+5. Challenges of Manual Carving
+
+5.1 Fragmentation
+	•	Files split across disk
+	•	Requires:
+	•	Fragment identification
+	•	Reconstruction logic
+	•	Handling missing segments
+
+⸻
+
+5.2 Time Complexity
+	•	Large datasets (GB–TB)
+	•	Manual scanning is slow
+
+⸻
+
+5.3 Technical Barriers
+	•	Corrupted headers
+	•	False positives
+	•	Proprietary formats
+	•	Encryption
+
+⸻
+
+5.4 Core Insight
+
+Manual carving =
+High precision + high effort
+
+⸻
+
+6. Automated File Carving
+
+6.1 Purpose
+	•	Speed up recovery
+	•	Reduce human error
+	•	Handle large datasets efficiently
+
+⸻
+
+6.2 Benefits
+	•	Faster processing
+	•	Scalable for large disks
+	•	Signature-based accuracy
+	•	Supports many file types
+
+⸻
+
+7. Scenario 3: Deleted File Recovery (Foremost & Scalpel)
+
+7.1 Observation
+	•	Mounted disk shows:
+
+lost+found
+
+
+
+→ Appears empty but contains unallocated data
+
+⸻
+
+7.2 Foremost
+
+Command:
+
+foremost -i Challenge3_deleted_disk.img -o output_dir -c /etc/custom_foremost.conf
+
+Key Features:
+	•	Scans entire disk
+	•	Uses config file:
+	•	File types
+	•	Headers/footers
+	•	Max file size
+
+⸻
+
+Targeted Extraction:
+
+foremost -t pdf,jpg,png -i Challenge3_deleted_disk.img -o output_dir
+
+
+⸻
+
+7.3 Scalpel
+
+Command:
+
+scalpel Challenge3_deleted_disk.img -o ScalpelOutput -c /etc/scalpel/scalpel.conf
+
+Process:
+	1.	First pass → identify boundaries
+	2.	Second pass → extract files
+
+⸻
+
+7.4 Foremost vs Scalpel
+
+Feature	Foremost	Scalpel
+Speed	Moderate	Faster
+Config	Flexible	Similar
+Fragment handling	Limited	Slightly better
+
+
+⸻
+
+8. Key Takeaways
+	•	Manual carving:
+	•	Precise but slow
+	•	Requires deep understanding
+	•	Automated carving:
+	•	Fast and scalable
+	•	May produce noise
+	•	Slack space:
+	•	Critical source of hidden data
+	•	Tools workflow:
+	•	Manual → targeted recovery
+	•	Automated → bulk recovery
+
+⸻
+
+9. Practical Workflow (Optimized)
+	1.	Inspect with hex editor
+	2.	Identify signatures manually
+	3.	Use dd for precise extraction
+	4.	Use binwalk for embedded/slack data
+	5.	Use foremost/scalpel for bulk recovery
+	6.	Validate using exiftool
+
+⸻
+
+10. Status
+
+✔ Manual carving understood
+✔ Slack space analysis understood
+✔ Automated carving understood
+✔ Tool usage clear
+⬜ Final module consolidation pending
