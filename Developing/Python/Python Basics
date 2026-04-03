@@ -1,0 +1,404 @@
+🐍 Python Basics – Complete Notes
+
+⸻
+
+1. Introduction to Python
+
+What is Python?
+	•	High-level, interpreted language
+	•	Easy syntax → beginner-friendly
+	•	Used in:
+	•	Web dev
+	•	Cybersecurity
+	•	Automation
+	•	AI/ML
+
+⸻
+
+Install & Run
+
+python3 file.py
+
+Interactive:
+
+python3
+
+
+⸻
+
+2. Variables & Data Types
+
+Declaring Variables
+
+x = 10
+name = "slamdad"
+
+Naming Rules
+	•	Letters, numbers, _
+	•	Cannot start with number
+	•	Case-sensitive
+
+⸻
+
+Common Data Types
+
+int_num = 10
+float_num = 10.5
+text = "hello"
+is_true = True
+
+Check Type
+
+print(type(x))
+
+
+⸻
+
+Print Function
+
+print("Hello")
+print("Value:", x)
+
+
+⸻
+
+3. Strings
+
+What is a String?
+
+s = "hello"
+
+
+⸻
+
+String Immutability
+
+s = "hello"
+# s[0] = "H" ❌ ERROR
+s = "Hello"  # ✔ new string created
+
+
+⸻
+
+Concatenation
+
+a = "Hello"
+b = "World"
+print(a + " " + b)
+
+
+⸻
+
+Interpolation (f-strings)
+
+name = "slamdad"
+print(f"Hello {name}")
+
+
+⸻
+
+String Slicing
+
+s = "Python"
+print(s[0:3])   # Pyt
+print(s[-1])    # n
+
+
+⸻
+
+Common Methods
+
+s = "hello"
+
+print(s.upper())
+print(s.lower())
+print(s.strip())
+print(s.replace("h", "H"))
+
+
+⸻
+
+4. Numbers & Operations
+
+Integers & Floats
+
+a = 10
+b = 2.5
+
+
+⸻
+
+Arithmetic
+
+print(a + b)
+print(a - b)
+print(a * b)
+print(a / b)
+print(a % 3)
+print(a ** 2)
+
+
+⸻
+
+Augmented Assignment
+
+x = 5
+x += 2   # 7
+x *= 3   # 21
+
+
+⸻
+
+5. Booleans & Conditionals
+
+Boolean Values
+
+True
+False
+
+
+⸻
+
+Conditions
+
+x = 10
+
+if x > 5:
+    print("Greater")
+elif x == 5:
+    print("Equal")
+else:
+    print("Smaller")
+
+
+⸻
+
+Logical Operators
+
+if x > 5 and x < 20:
+    print("Valid")
+
+
+⸻
+
+Truthy / Falsy
+
+Falsy:
+
+False, 0, "", None, [], {}
+
+Truthy:
+
+Everything else
+
+
+⸻
+
+Short Circuit
+
+False and print("won't run")
+True or print("won't run")
+
+
+⸻
+
+6. Functions & Scope
+
+Function Basics
+
+def greet():
+    print("Hello")
+
+greet()
+
+
+⸻
+
+With Parameters
+
+def add(a, b):
+    return a + b
+
+print(add(2, 3))
+
+
+⸻
+
+Scope
+
+x = 10  # global
+
+def func():
+    x = 5  # local
+    print(x)
+
+func()
+print(x)
+
+
+⸻
+
+7. Lists
+
+Create List
+
+lst = [1, 2, 3]
+
+
+⸻
+
+Access
+
+print(lst[0])
+
+
+⸻
+
+Common Methods
+
+lst.append(4)
+lst.remove(2)
+lst.pop()
+lst.sort()
+
+
+⸻
+
+8. Tuples
+
+Create Tuple
+
+t = (1, 2, 3)
+
+	•	Immutable
+
+⸻
+
+Methods
+
+t.count(1)
+t.index(2)
+
+
+⸻
+
+9. Loops
+
+For Loop
+
+for i in range(5):
+    print(i)
+
+
+⸻
+
+While Loop
+
+x = 0
+while x < 5:
+    print(x)
+    x += 1
+
+
+⸻
+
+10. Range
+
+range(5)        # 0-4
+range(1, 5)     # 1-4
+range(1, 10, 2) # step
+
+
+⸻
+
+11. Enumerate & Zip
+
+Enumerate
+
+lst = ["a", "b", "c"]
+
+for i, val in enumerate(lst):
+    print(i, val)
+
+
+⸻
+
+Zip
+
+a = [1, 2]
+b = ["x", "y"]
+
+for x, y in zip(a, b):
+    print(x, y)
+
+
+⸻
+
+12. List Comprehension
+
+nums = [1, 2, 3, 4]
+
+squares = [x**2 for x in nums]
+print(squares)
+
+
+⸻
+
+With Condition
+
+evens = [x for x in nums if x % 2 == 0]
+
+
+⸻
+
+13. Lambda Functions
+
+Syntax
+
+lambda arguments: expression
+
+
+⸻
+
+Example
+
+add = lambda a, b: a + b
+print(add(2, 3))
+
+
+⸻
+
+With map()
+
+nums = [1, 2, 3]
+
+result = list(map(lambda x: x * 2, nums))
+
+
+⸻
+
+🔥 Final Quick Summary
+
+Topic	Key Idea
+Variables	store data
+Strings	immutable
+Lists	mutable
+Tuples	immutable
+Functions	reusable code
+Loops	repetition
+Conditions	decision making
+Lambda	quick functions
+
+
+⸻
+
+🧠 Next Step Recommendation
+
+Since you’re into cybersecurity:
+
+You should next learn:
+	•	File handling
+	•	Regex
+	•	Networking (sockets)
+	•	Python for automation
+

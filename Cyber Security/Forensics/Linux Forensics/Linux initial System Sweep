@@ -1,0 +1,555 @@
+Linux Forensics 
+
+⸻
+
+1. OS & System Identification
+
+Command
+
+cat /etc/os-release
+
+Path
+
+/etc/os-release
+
+What it gives
+	•	OS name
+	•	Version
+	•	Distribution type
+
+Why it matters
+	•	Determines:
+	•	Log locations
+	•	Package manager
+	•	Known vulnerabilities
+
+⸻
+
+2. Hostname
+
+Command
+
+cat /etc/hostname
+
+Path
+
+/etc/hostname
+
+Purpose
+	•	Identifies system in network/logs
+
+⸻
+
+3. Timezone
+
+Command
+
+cat /etc/timezone
+
+Path
+
+/etc/timezone
+
+Why important
+	•	Needed for timeline correlation
+	•	Prevents misinterpretation of logs
+
+⸻
+
+4. User Enumeration
+
+Command
+
+cat /etc/passwd
+cat /etc/passwd | column -t -s :
+
+Path
+
+/etc/passwd
+
+Structure
+
+username : x : UID : GID : comment : home : shell
+
+Key Points
+	•	UID 0 → root
+	•	UID ≥ 1000 → normal users
+	•	/bin/bash → login allowed
+	•	/usr/sbin/nologin → no login
+
+⸻
+
+5. Password Storage
+
+Path
+
+/etc/shadow
+
+Meaning
+	•	Stores hashed passwords
+	•	/etc/passwd shows x → password stored here
+
+⸻
+
+6. Group Enumeration
+
+Command
+
+cat /etc/group
+
+Path
+
+/etc/group
+
+Structure
+
+group : x : GID : users
+
+Important Groups
+	•	sudo → root access
+	•	adm → log access
+	•	root → full control
+
+⸻
+
+Check user groups
+
+id username
+groups username
+
+
+⸻
+
+7. Sudo Privileges
+
+Command
+
+sudo cat /etc/sudoers
+
+Path
+
+/etc/sudoers
+
+Important Lines
+
+root ALL=(ALL:ALL) ALL
+%sudo ALL=(ALL:ALL) ALL
+
+Meaning
+	•	%sudo → group-based privilege
+	•	Users in sudo group → full root access
+
+⸻
+
+8. Login History
+
+Commands
+
+last
+last -f /var/log/wtmp
+last -f /var/log/btmp
+
+Paths
+
+/var/log/wtmp   → successful logins
+/var/log/btmp   → failed logins
+
+Notes
+	•	Binary files → cannot use cat
+	•	Use last
+
+⸻
+
+9. Authentication Logs
+
+Command
+
+cat /var/log/auth.log
+cat /var/log/auth.log* | grep COMMAND
+
+Path
+
+/var/log/auth.log
+
+What it shows
+	•	SSH logins
+	•	sudo usage
+	•	privilege escalation
+	•	user creation
+
+⸻
+
+Example interpretation
+
+COMMAND=/usr/bin/cat /etc/sudoers
+
+→ user executed command as root
+
+⸻
+
+10. Syslog (System Activity)
+
+Command
+
+cat /var/log/syslog
+cat /var/log/syslog* | head
+
+Path
+
+/var/log/syslog
+
+Contains
+	•	system events
+	•	cron jobs
+	•	services
+	•	kernel messages
+
+⸻
+
+Log Rotation
+
+Files:
+
+syslog
+syslog.1
+syslog.2.gz
+
+→ older logs compressed
+
+⸻
+
+11. Network Configuration
+
+Command
+
+cat /etc/network/interfaces
+
+Path
+
+/etc/network/interfaces
+
+Meaning
+	•	DHCP vs static IP
+	•	Interface configuration
+
+⸻
+
+12. IP & MAC Information
+
+Command
+
+ip address show
+
+Shows
+	•	IP address
+	•	MAC address
+	•	Interface state
+
+⸻
+
+13. Active Network Connections
+
+Command
+
+netstat -natp
+
+Meaning
+	•	Active connections
+	•	Listening ports
+	•	Remote IPs
+
+⸻
+
+Important Fields
+	•	LISTEN → open port
+	•	ESTABLISHED → active connection
+
+⸻
+
+14. Running Processes
+
+Command
+
+ps aux
+
+Purpose
+	•	Lists running processes
+
+⸻
+
+Key fields
+	•	USER
+	•	PID
+	•	COMMAND
+
+⸻
+
+15. DNS Configuration
+
+Hosts file
+
+Command
+
+cat /etc/hosts
+
+Path
+
+/etc/hosts
+
+Purpose
+	•	Local DNS mapping
+
+⸻
+
+DNS Resolver
+
+Command
+
+cat /etc/resolv.conf
+
+Path
+
+/etc/resolv.conf
+
+Purpose
+	•	DNS servers used
+
+⸻
+
+16. Persistence – Cron Jobs
+
+Command
+
+cat /etc/crontab
+
+Path
+
+/etc/crontab
+
+Format
+
+* * * * * user command
+
+
+⸻
+
+Important Directories
+
+/etc/cron.hourly
+/etc/cron.daily
+/etc/cron.weekly
+/etc/cron.monthly
+
+
+⸻
+
+Check contents
+
+ls -la /etc/cron.*
+
+
+⸻
+
+17. Persistence – Services
+
+Command
+
+ls /etc/init.d/
+
+Path
+
+/etc/init.d/
+
+Purpose
+	•	Services that start at boot
+
+⸻
+
+Modern systems also use
+
+/etc/systemd/system/
+
+
+⸻
+
+18. Persistence – Bash Startup
+
+Command
+
+cat ~/.bashrc
+
+Path
+
+~/.bashrc
+
+Also check
+
+~/.bash_profile
+~/.profile
+/etc/profile
+/etc/bash.bashrc
+
+
+⸻
+
+Why important
+	•	Executes on shell startup
+	•	Common persistence location
+
+⸻
+
+19. Command History
+
+Command
+
+cat ~/.bash_history
+
+Path
+
+~/.bash_history
+
+Contains
+	•	Commands executed by user
+
+⸻
+
+Notes
+	•	No timestamps (default)
+	•	Can be deleted
+
+⸻
+
+20. Sudo Command History
+
+Command
+
+cat /var/log/auth.log* | grep COMMAND
+
+Purpose
+	•	Tracks root-level commands
+
+⸻
+
+21. Vim File Access History
+
+Command
+
+cat ~/.viminfo
+
+Path
+
+~/.viminfo
+
+Contains
+	•	Opened files
+	•	search history
+	•	command history
+
+⸻
+
+22. Third-party Logs
+
+Directory
+
+/var/log/
+
+Command
+
+ls /var/log
+
+
+⸻
+
+Examples
+
+Apache
+
+/var/log/apache2/access.log
+/var/log/apache2/error.log
+
+Package manager
+
+/var/log/apt/
+/var/log/dpkg.log
+
+
+⸻
+
+23. Apache Log Analysis
+
+Access Log
+
+cat /var/log/apache2/access.log
+
+Shows
+	•	IP addresses
+	•	HTTP requests
+	•	status codes
+
+⸻
+
+Error Log
+
+cat /var/log/apache2/error.log
+
+Shows
+	•	server errors
+	•	failed requests
+
+⸻
+
+24. Key Forensic Workflow
+
+Step-by-step
+	1.	Identify system
+	•	/etc/os-release
+	2.	Identify users
+	•	/etc/passwd
+	•	/etc/group
+	3.	Check privileges
+	•	/etc/sudoers
+	4.	Analyze logs
+	•	/var/log/auth.log
+	•	/var/log/syslog
+	5.	Check persistence
+	•	cron
+	•	services
+	•	bashrc
+	6.	Review activity
+	•	bash_history
+	•	viminfo
+	7.	Check network
+	•	ip a
+	•	netstat
+	8.	Investigate applications
+	•	/var/log/apache2
+
+⸻
+
+25. Core Analyst Questions
+
+Always ask:
+	•	Who logged in?
+	•	When did it happen?
+	•	What commands were executed?
+	•	Did privilege escalation occur?
+	•	What persistence exists?
+	•	Any external connections?
+	•	Any suspicious files?
+
+⸻
+
+Final Learning Insight
+
+Linux forensics is based on correlation:
+
+Artifact	Purpose
+auth.log	authentication
+syslog	system activity
+bash_history	user commands
+cron	persistence
+netstat	connections
+viminfo	file access
+
+
+⸻
