@@ -1,0 +1,142 @@
+Basic Cryptography Concepts 
+
+⸻
+
+1. Purpose of Cryptography
+	•	Protect information so only intended recipients can understand it
+	•	Converts plaintext → ciphertext using an algorithm and key
+	•	Security depends on how hard it is to reverse without the key
+
+⸻
+
+2. Caesar Cipher (Substitution Cipher)
+
+Definition
+	•	A simple substitution cipher shifting letters by a fixed number
+
+Example
+	•	Plaintext: TRY HACK ME
+	•	Key: +3
+	•	Ciphertext: WUB KDFN PH
+
+Keyspace
+	•	25 possible keys (1–25)
+	•	0 or 26 → no change
+
+Weakness
+	•	Easily broken using brute force
+	•	Example:
+	•	Ciphertext: YMNX NX FQUMF GWFAT...
+	•	Correct key: 5
+	•	Result: THIS IS ALPHA BRAVO...
+
+⸻
+
+3. Types of Classical Ciphers
+
+A. Substitution Cipher
+	•	Replaces each letter with another
+	•	Order remains the same
+
+B. Transposition Cipher
+Definition
+	•	Rearranges positions of letters without changing them
+
+Process
+	1.	Write text in columns
+	2.	Rearrange columns using key (e.g., 42351)
+	3.	Read row-wise
+
+Key Idea
+	•	Letters stay the same, order changes
+
+⸻
+
+4. Brute Force Attack
+	•	Try all possible keys
+	•	Works when keyspace is small
+	•	Example: Caesar cipher easily broken this way
+
+⸻
+
+5. Secure Encryption Requirement
+	•	Should be computationally infeasible to break
+	•	Based on hard problems
+	•	Practical benchmark:
+	•	Break in 1 week → insecure
+	•	Break in 1 million years → secure
+
+⸻
+
+6. Monoalphabetic Substitution Cipher
+
+Definition
+	•	Each letter maps uniquely to another letter
+
+Example Mapping
+
+abcdefghijklmnopqrstuvwxyz
+xpatvrzyjhecsdikbfwunqgmol
+
+Keyspace
+	•	Extremely large (26! possibilities)
+
+⸻
+
+7. Weakness: Frequency Analysis
+	•	English letter frequency:
+	•	e → 13%
+	•	t → 9.1%
+	•	a → 8.2%
+	•	Common first letters:
+	•	t, a, o
+
+Attack Method
+	•	Analyze frequency patterns
+	•	Match with known language statistics
+	•	Use dictionary words
+
+Example Cipher
+
+Uyv sxd gyi siqvw x sinduxjd pvzjdw...
+
+Decrypted
+
+The man who moves a mountain begins by carrying away small stones.
+
+
+⸻
+
+8. Key Cryptography Concepts (Overview)
+
+Symmetric Encryption
+	•	Same key for encryption & decryption
+	•	Example: AES
+	•	Fast but key distribution is a problem
+
+Asymmetric Encryption
+	•	Public key + private key
+	•	Example: RSA
+	•	Solves key exchange problem
+
+Diffie-Hellman Key Exchange
+	•	Securely shares keys over insecure channels
+
+Hashing
+	•	One-way function
+	•	Used for passwords, integrity
+
+PKI (Public Key Infrastructure)
+	•	Manages keys and certificates
+	•	Ensures trust (e.g., HTTPS)
+
+⸻
+
+9. Core Takeaways
+	•	Simple ciphers (Caesar, substitution) are not secure
+	•	Security depends on:
+	•	Key size
+	•	Algorithm strength
+	•	Modern cryptography relies on:
+	•	Mathematical hardness
+	•	Computational infeasibility

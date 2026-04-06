@@ -1,0 +1,159 @@
+PKI - TLS/SSL Encryptions
+
+⸻
+
+13. Diffie-Hellman Weakness — MITM Attack
+
+Problem
+	•	Diffie-Hellman does NOT verify identity
+	•	No guarantee Alice ↔ Bob directly
+
+⸻
+
+Attack Flow (Mallory)
+
+1. Alice sends A → Mallory intercepts  
+2. Mallory sends M to Bob (pretends to be Alice)  
+3. Bob sends B → Mallory intercepts  
+4. Mallory sends M to Alice (pretends to be Bob)
+
+
+⸻
+
+Result
+
+Alice ↔ Mallory ↔ Bob
+
+	•	Alice computes key with Mallory
+	•	Bob computes key with Mallory
+	•	Mallory has BOTH keys
+
+✔ Can:
+	•	Read messages
+	•	Modify messages
+
+⸻
+
+14. Why MITM Happens
+
+No authentication in Diffie-Hellman
+→ Cannot verify identity of other party
+
+
+⸻
+
+15. Solution — PKI (Public Key Infrastructure)
+
+Purpose
+	•	Verify identity of communicating parties
+	•	Prevent MITM attacks
+
+⸻
+
+16. How PKI Solves the Problem
+
+Key Idea
+
+Trusted third party (CA) signs certificates
+
+
+⸻
+
+Certificate Contains
+	•	Public key
+	•	Domain name
+	•	CA signature
+
+⸻
+
+Verification Process
+
+1. Server sends certificate  
+2. Browser checks CA signature  
+3. Uses CA public key  
+4. Confirms certificate is valid  
+
+✔ If trusted → continue
+❌ If not → warning/block
+
+⸻
+
+17. Real Example (HTTPS)
+	•	When visiting a website:
+	•	Browser shows 🔒 (lock icon)
+	•	Means:
+
+Valid certificate + encrypted connection
+
+
+⸻
+
+18. Certificate Authority (CA)
+
+Examples:
+	•	DigiCert
+	•	Let’s Encrypt
+
+⸻
+
+Role
+
+CA signs certificate → proves identity of server
+
+
+⸻
+
+19. Certificate Signing Process
+
+Step 1 — Generate CSR
+
+openssl req -new -nodes -newkey rsa:4096 -keyout key.pem -out cert.csr
+
+
+⸻
+
+What happens here
+	•	Generate:
+	•	Private key
+	•	Public key
+	•	Create CSR (request for certificate)
+
+⸻
+
+Step 2 — Send to CA
+	•	CA verifies identity
+	•	Signs certificate
+
+⸻
+
+Step 3 — Use Signed Certificate
+	•	Install on server
+	•	Used for HTTPS
+
+⸻
+
+20. TLS + PKI + Diffie-Hellman (Combined Flow)
+
+1. Client connects to server  
+2. Server sends certificate  
+3. Client verifies using CA  
+4. Secure identity confirmed  
+5. Diffie-Hellman used → generate session key  
+6. Symmetric encryption used for communication
+
+
+⸻
+
+21. Key Takeaways
+	•	Diffie-Hellman alone ❌ vulnerable to MITM
+	•	PKI adds:
+	•	Identity verification
+	•	Trust
+	•	HTTPS = combination of:
+	•	PKI + TLS + symmetric encryption
+
+⸻
+
+22. One-line Summary
+
+Diffie-Hellman enables key exchange but is vulnerable to MITM; PKI and certificates solve this by verifying identities and enabling secure HTTPS communication.

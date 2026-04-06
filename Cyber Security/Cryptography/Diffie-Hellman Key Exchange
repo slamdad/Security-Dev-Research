@@ -1,0 +1,178 @@
+Diffie-Hellman Key Exchange 
+
+⸻
+
+1. Core Idea
+	•	Allows two parties to create a shared secret over an insecure channel
+	•	No need to send the actual key
+
+Public data → shared  
+Secret values → never shared  
+Final key → same on both sides
+
+
+⸻
+
+2. Problem It Solves
+	•	In symmetric encryption:
+	•	Key must be shared securely ❌
+	•	Diffie-Hellman:
+	•	Key is derived, not transmitted ✅
+
+⸻
+
+3. Step-by-Step Process
+
+⸻
+
+Step 0 — Public Agreement
+
+q = prime number  
+g = generator  
+
+Example:
+
+q = 29  
+g = 3
+
+✔ These are public (anyone can see)
+
+⸻
+
+Step 1 — Alice
+
+Choose secret a = 13  
+Compute A = g^a mod q = 3^13 mod 29 = 19  
+Send A to Bob
+
+
+⸻
+
+Step 2 — Bob
+
+Choose secret b = 15  
+Compute B = g^b mod q = 3^15 mod 29 = 26  
+Send B to Alice
+
+
+⸻
+
+Step 3 — Shared Key Calculation
+
+Alice computes:
+
+Key = B^a mod q = 26^13 mod 29 = 10
+
+Bob computes:
+
+Key = A^b mod q = 19^15 mod 29 = 10
+
+✔ Both get same key = 10
+
+⸻
+
+4. Why It Works
+
+(g^a)^b mod q = (g^b)^a mod q
+
+👉 Same result on both sides
+
+⸻
+
+5. What Attacker Sees
+
+q, g, A, B
+
+But cannot compute:
+
+a or b → therefore cannot get key
+
+
+⸻
+
+6. Security Basis
+	•	Hard problem:
+
+Discrete Logarithm Problem
+
+	•	Easy:
+
+g^a mod q
+
+	•	Hard:
+
+Find a from result
+
+
+⸻
+
+7. Real-World Parameters
+	•	q size:
+	•	2048 bits or more
+	•	Very large → infeasible to break
+
+⸻
+
+8. OpenSSL Commands
+
+Generate parameters
+
+openssl dhparam -out dhparams.pem 2048
+
+
+⸻
+
+View parameters
+
+openssl dhparam -in dhparams.pem -text -noout
+
+
+⸻
+
+Output includes:
+
+P → prime number (q)  
+G → generator
+
+
+⸻
+
+9. Major Weakness (IMPORTANT)
+
+Man-in-the-Middle (MITM) Attack
+	•	Attacker intercepts communication
+	•	Pretends to be:
+	•	Bob to Alice
+	•	Alice to Bob
+
+Alice ↔ Attacker ↔ Bob
+
+✔ Both think they are communicating securely
+❌ Actually attacker controls keys
+
+⸻
+
+10. Why MITM Works
+	•	No authentication in basic Diffie-Hellman
+	•	No identity verification
+
+⸻
+
+11. Real-World Fix
+	•	Use with:
+	•	Digital signatures
+	•	Certificates (TLS)
+
+⸻
+
+12. Key Takeaways
+	•	Diffie-Hellman = key exchange, not encryption
+	•	Works over insecure channels
+	•	Shared secret is never transmitted
+	•	Vulnerable to MITM without authentication
+
+⸻
+
+13. One-line Summary
+
+Diffie-Hellman allows two parties to generate a shared secret over an insecure channel using public values and private secrets, but requires authentication to prevent MITM attacks.

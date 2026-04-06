@@ -1,0 +1,196 @@
+Asymmetric Encryption 
+
+⸻
+
+1. Core Concept
+	•	Uses two keys (key pair):
+	•	Public Key → shared openly
+	•	Private Key → kept secret
+
+Public Key → Encrypt  
+Private Key → Decrypt
+
+
+⸻
+
+2. Why Asymmetric Encryption is Needed
+
+Problem with Symmetric Encryption
+	•	Requires secure channel to share key
+	•	Not scalable (many users → many keys)
+
+⸻
+
+Solution (Asymmetric)
+	•	No need for secure channel
+	•	Only need reliable channel (integrity)
+	•	Public key can be shared safely
+
+⸻
+
+3. How Key Pair Works
+
+Case 1 — Confidentiality
+
+Alice → encrypt with Bob’s PUBLIC key  
+Bob → decrypt with his PRIVATE key
+
+✔ Only Bob can read the message
+
+⸻
+
+Case 2 — Authenticity (Digital Signature)
+
+Bob → encrypt/sign with PRIVATE key  
+Anyone → verify using Bob’s PUBLIC key
+
+✔ Confirms message came from Bob
+
+⸻
+
+4. Security Properties
+
+1. Confidentiality
+	•	Only intended recipient can decrypt
+
+⸻
+
+2. Integrity
+	•	Any change → decryption fails / invalid
+
+⸻
+
+3. Authenticity
+	•	Confirms sender identity
+
+⸻
+
+4. Non-repudiation
+	•	Sender cannot deny sending message
+
+⸻
+
+5. RSA (Core Algorithm)
+	•	Based on:
+	•	Two large prime numbers (p, q)
+	•	Hard problem: factorization
+
+⸻
+
+Keys
+
+Public Key  = (N, e)  
+Private Key = (N, d)
+
+
+⸻
+
+Process
+	•	Encryption:
+
+y = x^e mod N
+
+	•	Decryption:
+
+x = y^d mod N
+
+
+⸻
+
+Key Idea
+	•	Easy: multiply primes
+	•	Hard: reverse (factor N)
+
+⸻
+
+6. Real Key Generation (OpenSSL)
+
+⸻
+
+Generate Private Key
+
+openssl genrsa -out private-key.pem 2048
+
+	•	Creates RSA private key (2048-bit)
+
+⸻
+
+Extract Public Key
+
+openssl rsa -in private-key.pem -pubout -out public-key.pem
+
+
+⸻
+
+View Key Details
+
+openssl rsa -in private-key.pem -text -noout
+
+	•	Shows:
+	•	modulus (N)
+	•	publicExponent (e)
+	•	privateExponent (d)
+	•	primes (p, q)
+
+⸻
+
+7. Encryption & Decryption (RSA)
+
+⸻
+
+Encrypt (using public key)
+
+openssl pkeyutl -encrypt \
+-in plaintext.txt \
+-out ciphertext \
+-inkey public-key.pem -pubin
+
+
+⸻
+
+Decrypt (using private key)
+
+openssl pkeyutl -decrypt \
+-in ciphertext \
+-inkey private-key.pem \
+-out decrypted.txt
+
+
+⸻
+
+8. Important Notes
+	•	Asymmetric encryption is slow
+	•	Used mainly for:
+	•	Key exchange
+	•	Authentication
+	•	Digital signatures
+
+⸻
+
+9. Hybrid Encryption (Real-world)
+
+Asymmetric → exchange key  
+Symmetric → encrypt data
+
+✔ Used in:
+	•	HTTPS
+	•	SSH
+	•	VPNs
+
+⸻
+
+10. Key Takeaways
+	•	Two-key system solves key exchange problem
+	•	Public key → share
+	•	Private key → protect
+	•	Provides:
+	•	Confidentiality
+	•	Integrity
+	•	Authenticity
+	•	Non-repudiation
+
+⸻
+
+11. One-line Summary
+
+Asymmetric encryption uses a public-private key pair to securely exchange data without needing a secure channel, enabling confidentiality and authentication.

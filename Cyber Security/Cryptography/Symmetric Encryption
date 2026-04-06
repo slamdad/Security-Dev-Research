@@ -1,0 +1,184 @@
+Symmetric Encryption 
+
+⸻
+
+1. Core Definitions
+	•	Cipher / Algorithm
+Method used to encrypt and decrypt data
+	•	Key
+Secret value used by the algorithm
+	•	Plaintext
+Original readable message
+	•	Ciphertext
+Encrypted unreadable output
+
+⸻
+
+2. Symmetric Encryption (Main Concept)
+	•	Same key is used for:
+	•	Encryption
+	•	Decryption
+
+Plaintext + Key → Encrypt → Ciphertext  
+Ciphertext + Same Key → Decrypt → Plaintext
+
+
+⸻
+
+3. Example Flow (Important)
+
+Input:
+
+TANGO HOTEL MIKE
+
+Step 1 — Convert to ASCII → Hex
+
+T  → 54
+A  → 41
+N  → 4E
+G  → 47
+O  → 4F
+(space) → 20
+
+Final:
+
+54 41 4E 47 4F 20 48 4F 54 45 4C 20 4D 49 4B 45
+
+
+⸻
+
+Step 2 — Form AES Block (128-bit = 16 bytes)
+
+54 41 4E 47
+4F 20 48 4F
+54 45 4C 20
+4D 49 4B 45
+
+→ This is called the state matrix (4×4)
+
+⸻
+
+Step 3 — AES Encryption Process
+
+AES applies multiple rounds of:
+
+1. SubBytes
+	•	Replace each byte using lookup table (S-box)
+
+2. ShiftRows
+	•	Row 1 → no shift
+	•	Row 2 → shift left by 1
+	•	Row 3 → shift left by 2
+	•	Row 4 → shift left by 3
+
+3. MixColumns
+	•	Mix values in each column mathematically
+
+4. AddRoundKey
+	•	XOR with key
+
+⸻
+
+Output:
+
+Ciphertext (hex)
+EB C2 03 3F ...
+
+
+⸻
+
+4. Block Cipher vs Stream Cipher
+
+Block Cipher (AES)
+	•	Works on fixed size blocks (128 bits)
+	•	Example:
+
+[TANGO HOTEL MIKE] → one block → encrypt
+
+
+⸻
+
+Stream Cipher
+	•	Encrypts byte-by-byte
+
+54 → encrypt
+41 → encrypt
+4E → encrypt
+...
+
+
+⸻
+
+5. Important Algorithms
+
+Old (Insecure)
+	•	DES (56-bit key → broken)
+	•	3DES (deprecated)
+
+Modern (Secure)
+	•	AES (128 / 192 / 256-bit)
+	•	Blowfish / Twofish
+	•	Camellia
+
+⸻
+
+6. Security Properties Achieved
+
+Confidentiality
+	•	Data cannot be read without key
+
+Integrity
+	•	Changes in ciphertext break decryption
+
+Authenticity
+	•	Only someone with key could send it
+
+⸻
+
+7. Major Limitation (Very Important)
+
+Key Distribution Problem
+
+For:
+	•	2 users → 1 key
+	•	3 users → 3 keys
+	•	100 users → 4950 keys
+
+Formula:
+
+n(n - 1) / 2
+
+
+⸻
+
+8. Tools Used
+
+GPG
+
+gpg --symmetric file.txt
+gpg --decrypt file.txt.gpg
+
+OpenSSL
+
+openssl aes-256-cbc -e -in file.txt -out enc
+openssl aes-256-cbc -d -in enc -out file.txt
+
+With stronger protection:
+
+-pbkdf2 -iter 10000
+
+
+⸻
+
+9. Key Takeaways
+	•	Symmetric encryption = fast and efficient
+	•	Uses same secret key
+	•	AES = current standard
+	•	Works on binary/hex data (not raw text)
+	•	Main problem = key sharing
+
+⸻
+
+10. One-line Summary
+
+Text → ASCII → Hex → Block → AES rounds → Ciphertext (requires same key to decrypt)
