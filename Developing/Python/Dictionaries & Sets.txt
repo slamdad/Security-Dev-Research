@@ -1,0 +1,817 @@
+                -------------- Python Dictionaries — Full Notes --------------
+
+⸻
+
+1. What is a Dictionary?
+
+A dictionary stores key → value pairs.
+
+student = {
+    "name": "John",
+    "age": 20
+}
+
+
+⸻
+
+2. Basic Syntax Structure
+
+dictionary = {
+    key1: value1,
+    key2: value2
+}
+
+Example
+
+pizza = {
+    "name": "Margherita Pizza",
+    "price": 8.9,
+    "calories_per_slice": 250,
+    "toppings": ["mozzarella", "basil"]
+}
+
+
+⸻
+
+3. Keys Rules
+
+d = {
+    "name": "Alice",   # string key
+    1: "one",          # integer key
+    (1, 2): "tuple"    # tuple key (immutable)
+}
+
+❌ Invalid:
+
+d = {
+    ["list"]: "value"   # list is mutable → error
+}
+
+
+⸻
+
+4. Values Rules
+
+Values can be anything:
+
+data = {
+    "int": 10,
+    "float": 2.5,
+    "list": [1, 2, 3],
+    "dict": {"a": 1}
+}
+
+
+⸻
+
+5. Creating Dictionary using dict()
+
+pizza = dict([
+    ("name", "Margherita Pizza"),
+    ("price", 8.9),
+    ("calories_per_slice", 250),
+    ("toppings", ["mozzarella", "basil"])
+])
+
+
+⸻
+
+6. Accessing Values (Bracket Notation)
+
+pizza = {"name": "Margherita Pizza"}
+
+print(pizza["name"])
+
+Output:
+
+Margherita Pizza
+
+❌ Error case:
+
+pizza["price"]   # KeyError
+
+
+⸻
+
+7. Updating Values
+
+pizza = {"name": "Margherita Pizza"}
+
+pizza["name"] = "Margherita"
+print(pizza["name"])
+
+Output:
+
+Margherita
+
+
+⸻
+
+8. Adding New Key (Important Concept)
+
+pizza = {"name": "Pizza"}
+
+pizza["price"] = 10
+
+Result:
+
+{"name": "Pizza", "price": 10}
+
+✔ If key doesn’t exist → it is created
+
+⸻
+
+9. Dictionary Order (Python 3.7+)
+
+d = {"a": 1, "b": 2, "c": 3}
+
+for key in d:
+    print(key)
+
+Output:
+
+a
+b
+c
+
+✔ Order preserved
+
+⸻
+
+10. .get() Method
+
+pizza = {"toppings": ["cheese", "basil"]}
+
+print(pizza.get("toppings", []))
+
+Output:
+
+['cheese', 'basil']
+
+
+⸻
+
+.get() when key missing
+
+pizza = {}
+
+print(pizza.get("toppings", []))
+
+Output:
+
+[]
+
+✔ No error
+✔ Returns default
+
+⸻
+
+11. .keys() Method
+
+pizza = {
+    "name": "Pizza",
+    "price": 10
+}
+
+print(pizza.keys())
+
+Output:
+
+dict_keys(['name', 'price'])
+
+
+⸻
+
+12. .values() Method
+
+print(pizza.values())
+
+Output:
+
+dict_values(['Pizza', 10])
+
+
+⸻
+
+13. .items() Method
+
+print(pizza.items())
+
+Output:
+
+dict_items([('name', 'Pizza'), ('price', 10)])
+
+
+⸻
+
+14. Loop using .items()
+
+for key, value in pizza.items():
+    print(key, value)
+
+Output:
+
+name Pizza
+price 10
+
+
+⸻
+
+15. .clear() Method
+
+pizza = {"name": "Pizza", "price": 10}
+
+pizza.clear()
+print(pizza)
+
+Output:
+
+{}
+
+
+⸻
+
+16. .pop() Method
+
+Case 1 — Key exists
+
+pizza = {"price": 10}
+
+print(pizza.pop("price"))
+
+Output:
+
+10
+
+Result:
+
+{}
+
+
+⸻
+
+Case 2 — Key missing with default
+
+pizza = {}
+
+print(pizza.pop("price", 0))
+
+Output:
+
+0
+
+
+⸻
+
+Case 3 — Key missing without default
+
+pizza = {}
+
+pizza.pop("price")
+
+❌ Output:
+
+KeyError: 'price'
+
+
+⸻
+
+17. .popitem() Method
+
+pizza = {"a": 1, "b": 2}
+
+pizza.popitem()
+
+Output:
+
+('b', 2)
+
+Result:
+
+{"a": 1}
+
+✔ Removes last inserted item
+
+⸻
+
+18. .update() Method
+
+pizza = {
+    "name": "Pizza",
+    "price": 10
+}
+
+pizza.update({
+    "price": 15,
+    "total_time": 25
+})
+
+Result:
+
+{
+    "name": "Pizza",
+    "price": 15,
+    "total_time": 25
+}
+
+✔ Existing key → overwritten
+✔ New key → added
+
+⸻
+
+19. View Objects Concept
+
+pizza = {"a": 1, "b": 2}
+
+keys = pizza.keys()
+print(keys)
+
+Output:
+
+dict_keys(['a', 'b'])
+
+✔ Not a copy
+✔ Reflects changes:
+
+pizza["c"] = 3
+print(keys)
+
+Output:
+
+dict_keys(['a', 'b', 'c'])
+
+
+⸻
+
+20. Real Structured Data Example
+
+user = {
+    "id": 101,
+    "username": "admin",
+    "permissions": ["read", "write"],
+    "active": True
+}
+
+
+21. Looping Through Values (.values())
+
+products = {
+    'Laptop': 990,
+    'Smartphone': 600,
+    'Tablet': 250,
+    'Headphones': 70,
+}
+
+for price in products.values():
+    print(price)
+
+Output
+
+990
+600
+250
+70
+
+✔ Iterates only over values
+
+⸻
+
+22. Looping Through Keys (.keys() or direct)
+
+for product in products.keys():
+    print(product)
+
+# OR (more common)
+for product in products:
+    print(product)
+
+Output
+
+Laptop
+Smartphone
+Tablet
+Headphones
+
+✔ Iterates only over keys
+
+⸻
+
+23. Looping Through Key–Value Pairs (.items())
+
+for item in products.items():
+    print(item)
+
+Output
+
+('Laptop', 990)
+('Smartphone', 600)
+('Tablet', 250)
+('Headphones', 70)
+
+✔ Each item is a tuple (key, value)
+
+⸻
+
+24. Unpacking Key–Value Pairs
+
+for product, price in products.items():
+    print(product, price)
+
+Output
+
+Laptop 990
+Smartphone 600
+Tablet 250
+Headphones 70
+
+✔ Clean way to access both key and value
+
+⸻
+
+25. Updating Values in Loop (20% Discount)
+
+products = {
+    'Laptop': 990,
+    'Smartphone': 600,
+    'Tablet': 250,
+    'Headphones': 70,
+}
+
+for product, price in products.items():
+    products[product] = round(price * 0.8)
+
+print(products)
+
+Output
+
+{
+    'Laptop': 792,
+    'Smartphone': 480,
+    'Tablet': 200,
+    'Headphones': 56
+}
+
+✔ Applies 20% discount
+✔ Updates dictionary in-place
+
+⸻
+
+26. enumerate() with Dictionary Keys
+
+for item in enumerate(products):
+    print(item)
+
+Output
+
+(0, 'Laptop')
+(1, 'Smartphone')
+(2, 'Tablet')
+(3, 'Headphones')
+
+✔ Adds index (counter) to each key
+
+⸻
+
+27. Unpacking enumerate()
+
+for index, product in enumerate(products):
+    print(index, product)
+
+Output
+
+0 Laptop
+1 Smartphone
+2 Tablet
+3 Headphones
+
+
+⸻
+
+28. enumerate() with Values
+
+for item in enumerate(products.values()):
+    print(item)
+
+Output
+
+(0, 990)
+(1, 600)
+(2, 250)
+(3, 70)
+
+
+⸻
+
+Unpacked version
+
+for index, price in enumerate(products.values()):
+    print(index, price)
+
+
+⸻
+
+29. enumerate() with .items()
+
+for index, item in enumerate(products.items()):
+    print(index, item)
+
+Output
+
+0 ('Laptop', 990)
+1 ('Smartphone', 600)
+2 ('Tablet', 250)
+3 ('Headphones', 70)
+
+
+⸻
+
+30. Custom Start Index in enumerate()
+
+for index, item in enumerate(products.items(), 1):
+    print(index, item)
+
+Output
+
+1 ('Laptop', 990)
+2 ('Smartphone', 600)
+3 ('Tablet', 250)
+4 ('Headphones', 70)
+
+✔ Starts counting from 1 instead of 0
+
+⸻
+
+31. Key Concepts Summary (Looping)
+	•	.values() → loop values only
+	•	.keys() / direct → loop keys
+	•	.items() → loop key + value
+	•	enumerate() → adds index counter
+	•	Can combine:
+	•	enumerate(products)
+	•	enumerate(products.values())
+	•	enumerate(products.items())
+
+⸻
+
+32. Practical Insight
+
+When to use what
+
+Situation	Use
+Need only prices	.values()
+Need product names	.keys() / direct
+Need both	.items()
+Need index	enumerate()
+
+
+⸻
+
+33. Important Note (Advanced)
+
+When modifying dictionary values:
+
+for product, price in products.items():
+    products[product] = ...
+
+✔ Safe because:
+	•	Keys are not changing
+	•	Only values are updated
+
+⸻
+
+Final Combined Understanding
+
+Looping + dictionaries allows you to:
+	•	Read data (.values(), .keys())
+	•	Process data (.items())
+	•	Modify data (assignment inside loop)
+	•	Track position (enumerate())
+
+                -------------- Python Sets - Full Notes --------------
+
+⸻
+
+34. What is a Set?
+	•	Collection of unique values
+	•	No duplicates allowed
+	•	Unordered (no indexing)
+	•	Mutable (can change)
+
+my_set = {1, 2, 3, 4, 5}
+
+
+⸻
+
+35. Important Rules
+	•	Only immutable types allowed (int, str, tuple)
+	•	No lists or dicts inside sets
+
+valid = {1, "a", (1,2)}   # ✅
+# invalid = {[1,2]}       # ❌ error
+
+
+⸻
+
+36. Empty Set vs Dictionary
+
+set()   # ✅ set
+{}      # ❌ dictionary
+
+
+⸻
+
+37. Adding Elements
+
+my_set = {1, 2, 3}
+
+my_set.add(4)
+print(my_set)
+
+Output:
+
+{1, 2, 3, 4}
+
+
+⸻
+
+Adding Duplicate (No Effect)
+
+my_set.add(3)
+print(my_set)
+
+Output:
+
+{1, 2, 3, 4}
+
+✔ Duplicate ignored automatically
+
+⸻
+
+38. Removing Elements
+
+.remove() (strict)
+
+my_set.remove(2)
+
+❌ Error if not found
+
+⸻
+
+.discard() (safe)
+
+my_set.discard(10)
+
+✔ No error
+
+⸻
+
+39. Clearing Set
+
+my_set.clear()
+print(my_set)
+
+Output:
+
+set()
+
+
+⸻
+
+40. Subset & Superset
+
+my_set = {1, 2, 3, 4, 5}
+your_set = {2, 3, 4, 6}
+
+print(your_set.issubset(my_set))   # False
+print(my_set.issuperset(your_set)) # False
+
+✔ Not all elements match → False
+
+⸻
+
+41. Disjoint Sets
+
+print(my_set.isdisjoint(your_set))
+
+Output:
+
+False
+
+✔ Because they share {2, 3, 4}
+
+⸻
+
+42. Set Operations
+
+Union |
+
+my_set | your_set
+
+Output:
+
+{1, 2, 3, 4, 5, 6}
+
+
+⸻
+
+Intersection &
+
+my_set & your_set
+
+Output:
+
+{2, 3, 4}
+
+
+⸻
+
+Difference -
+
+my_set - your_set
+
+Output:
+
+{1, 5}
+
+
+⸻
+
+Symmetric Difference ^
+
+my_set ^ your_set
+
+Output:
+
+{1, 5, 6}
+
+
+⸻
+
+43. Compound Operators (In-place update)
+
+Difference update
+
+my_set -= your_set
+
+Result:
+
+{1, 5}
+
+
+⸻
+
+Others also exist
+
+my_set |= your_set   # union update
+my_set &= your_set   # intersection update
+my_set ^= your_set   # symmetric diff update
+
+
+⸻
+
+44. Membership Check
+
+my_set = {1, 2, 3}
+
+print(2 in my_set)   # True
+print(5 in my_set)   # False
+
+
+⸻
+
+45. Key Concepts Summary
+	•	No duplicates
+	•	Unordered
+	•	Fast membership checking
+	•	Supports mathematical operations
+
+⸻
+
+46. When to Use Sets
+
+✔ Removing duplicates
+
+nums = [1,2,2,3]
+print(set(nums))   # {1,2,3}
+
+✔ Checking membership fast
+
+if ip in blocked_ips:
+    print("Blocked")
+
+✔ Comparing datasets
+
+common = set1 & set2
+
+
+⸻
+
+Final Combined Understanding
+	•	Set = unique values only
+	•	Dictionary = key → value mapping
+	•	Sets are best for:
+	•	Filtering duplicates
+	•	Membership checks
+	•	Comparing collections
+
+⸻
