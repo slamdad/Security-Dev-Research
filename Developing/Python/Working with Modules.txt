@@ -1,0 +1,299 @@
+Python Standard Library & Importing Modules 
+
+⸻
+
+1. What is a Library?
+
+A library is a collection of pre-written code (functions, classes, tools) that you can reuse instead of writing everything from scratch.
+
+Simple idea:
+	•	Without library → you build everything yourself
+	•	With library → you reuse ready-made tools
+
+⸻
+
+2. What is the Python Standard Library?
+
+The Python Standard Library is a built-in collection of modules that come with Python.
+
+You do not need to install them—they are already available.
+
+⸻
+
+Common Uses of Standard Library
+
+It provides tools for:
+	•	Operating system interaction → os
+	•	File handling → open, pathlib
+	•	Math operations → math
+	•	Random values → random
+	•	Dates & time → datetime
+	•	Regular expressions → re
+	•	Debugging/testing → unittest, logging
+
+⸻
+
+Examples of Modules
+
+Module	Purpose
+math	Mathematical functions
+random	Random number generation
+datetime	Dates and time
+re	Pattern matching (regex)
+
+
+⸻
+
+3. How to Import a Module
+
+Basic Syntax
+
+import module_name
+
+Example:
+
+import math
+print(math.sqrt(36))
+
+
+⸻
+
+How it works
+	•	math → module name
+	•	sqrt() → function inside the module
+	•	. → used to access module contents
+
+⸻
+
+4. Import with Alias
+
+Used to shorten names.
+
+import math as m
+print(m.sqrt(36))
+
+
+⸻
+
+5. Import Specific Items
+
+Instead of importing everything:
+
+from math import sqrt
+print(sqrt(36))
+
+
+⸻
+
+Multiple imports
+
+from math import radians, sin, cos
+
+Example:
+
+from math import radians, sin, cos
+
+angle = 40
+rad = radians(angle)
+
+print(sin(rad))
+print(cos(rad))
+
+
+⸻
+
+Import with Alias (Specific)
+
+from math import sqrt as s
+print(s(36))
+
+
+⸻
+
+6. Import Everything (Not Recommended)
+
+from math import *
+print(sqrt(36))
+
+Problem:
+	•	Can overwrite existing variables
+	•	Hard to track where functions come from
+
+⸻
+
+7. Types of Things You Can Import
+
+Functions
+
+math.sqrt(36)
+
+Constants
+
+import math
+print(math.pi)
+
+Classes
+
+import datetime
+
+d = datetime.date(2020, 1, 1)
+print(d.year)
+
+
+⸻
+
+8. What is a Module?
+
+A module = a Python file (.py) containing code.
+
+Example:
+
+# mymodule.py
+def greet():
+    print("Hello")
+
+You can import it:
+
+import mymodule
+mymodule.greet()
+
+
+⸻
+
+9. Important Concept: __name__
+
+__name__ tells Python how the file is being used.
+
+⸻
+
+Case 1: Run directly
+
+python file.py
+
+Then:
+
+__name__ == "__main__"
+
+
+⸻
+
+Case 2: Imported
+
+import file
+
+Then:
+
+__name__ == "file"
+
+
+⸻
+
+10. if __name__ == "__main__" Explained
+
+Syntax
+
+if __name__ == "__main__":
+    # code
+
+
+⸻
+
+Why it is used
+
+It ensures some code runs only when the file is executed directly, not when imported.
+
+⸻
+
+Example
+
+file: test.py
+
+def greet():
+    print("Hello")
+
+if __name__ == "__main__":
+    greet()
+
+
+⸻
+
+Run directly:
+
+python test.py
+
+Output:
+
+Hello
+
+
+⸻
+
+Import it:
+
+import test
+
+Output:
+
+(no output)
+
+
+⸻
+
+11. Without This Condition (Problem)
+
+def greet():
+    print("Hello")
+
+greet()
+
+If imported:
+
+import test
+
+Output:
+
+Hello  ❌ (runs automatically)
+
+
+⸻
+
+12. Why This is Important
+
+It allows a file to act as:
+
+1. Script (main program)
+	•	Runs logic when executed
+
+2. Module (reusable code)
+	•	Does not auto-run when imported
+
+⸻
+
+13. Simple Understanding
+	•	__main__ → “I am running this file”
+	•	filename → “I am imported”
+
+⸻
+
+14. Best Practice Summary
+
+Use:
+
+if __name__ == "__main__":
+    # main execution code
+
+Keep:
+	•	Functions/classes → outside
+	•	Running code → inside
+
+⸻
+
+Final Summary
+	•	Standard Library = built-in toolbox
+	•	Modules = Python files with code
+	•	import = bring module into your program
+	•	Dot (.) = access module content
+	•	__name__ = tells how file is used
+	•	if __name__ == "__main__" = control execution
+
+⸻
