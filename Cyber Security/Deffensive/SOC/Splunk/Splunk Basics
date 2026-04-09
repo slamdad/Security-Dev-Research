@@ -1,0 +1,464 @@
+Splunk Complete Basic Reference 
+
+⸻
+
+1. Search History & Data Summary
+
+Search History
+	•	Shows previous queries you ran
+	•	Useful for:
+	•	Revisiting past investigations
+	•	Reusing working queries
+	•	Understanding workflow
+
+⸻
+
+Data Summary
+
+Provides:
+	•	Hosts → Machines sending logs
+	•	Sources → File/log origin
+	•	Sourcetypes → Log format (Windows, Sysmon, etc.)
+
+⸻
+
+2. Your First Search
+
+index=windowslogs
+
+Explanation
+	•	index = Splunk database/container
+	•	windowslogs = dataset of Windows logs
+	•	Time range → Set to “All time”
+
+⸻
+
+3. Fields Sidebar (VERY IMPORTANT)
+
+Sections
+
+Selected Fields
+	•	Default extracted fields
+	•	You can toggle ON/OFF
+
+Interesting Fields
+	•	Auto-detected useful fields
+	•	Helps in quick investigation
+
+⸻
+
+Field Types
+	•	# → Numeric fields
+	•	α → Text fields
+
+⸻
+
+Field Info
+	•	Count → How many events contain that field
+	•	Top values → Most frequent values
+
+⸻
+
+4. SPL Basics
+
+Structure
+
+index=windowslogs <conditions> | <commands>
+
+	•	Left side → Filtering
+	•	Right side (|) → Processing
+
+⸻
+
+5. Free Text Search
+
+index=windowslogs alice
+
+Explanation
+	•	Searches any field
+	•	Case-insensitive
+	•	Good for:
+	•	Unknown fields
+	•	Quick hunting
+
+⸻
+
+6. Search Operators
+
+⸻
+
+A. Relational Operators
+
+Operator	Example	Explanation
+=	User=James	Exact match
+!=	User!=SYSTEM	Exclude value
+<	Age<10	Less than
+>	Traffic>50	Greater than
+
+
+⸻
+
+Example
+
+index=windowslogs AccountName!=SYSTEM
+
+→ Removes system noise
+
+⸻
+
+B. Logical Operators
+
+Operator	Example	Explanation
+AND	User=James AND EventID=4624	Both conditions
+OR	User=James OR User=Alice	Either
+NOT	NOT User=*	Field missing
+IN	User IN (James,Alice)	Multiple match
+
+
+⸻
+
+Example
+
+index=windowslogs AccountName!=SYSTEM AccountName=James
+
+Explanation
+	•	AND is implied
+	•	Returns only James (not SYSTEM)
+
+⸻
+
+C. Wildcards
+
+Image=*.exe
+SourceIp=192.168.*
+
+Explanation
+	•	* = anything
+	•	Useful for:
+	•	Partial matches
+	•	Unknown values
+
+⸻
+
+D. CIDR Search
+
+SourceIp=192.168.1.0/24
+
+Explanation
+	•	Matches IP subnet
+	•	Useful for network analysis
+
+⸻
+
+7. Quotes & Order of Evaluation
+
+⸻
+
+Quotes
+
+"failed login"
+
+	•	Exact phrase match
+
+⸻
+
+Order of Evaluation
+
+Problem
+
+alice AND bob OR charlie
+
+Splunk interprets:
+
+alice AND (bob OR charlie)
+
+
+⸻
+
+Correct
+
+(alice AND bob) OR charlie
+
+
+⸻
+
+8. Pipeline Concept (|)
+	•	Each command passes output to next
+
+index=windowslogs | table User EventID
+
+
+⸻
+
+9. Filtering Commands
+
+⸻
+
+fields
+
+index=windowslogs | fields User SourceIp Image
+
+Explanation
+	•	Limits visible fields
+	•	Reduces noise
+
+⸻
+
+dedup
+
+| dedup SourceIp
+
+Explanation
+	•	Removes duplicate values
+	•	Keeps first occurrence
+
+⸻
+
+rename
+
+| rename User as Employee
+
+Explanation
+	•	Improves readability
+
+⸻
+
+regex
+
+| regex Image="\.exe$"
+
+Explanation
+	•	Matches pattern
+	•	$ = end of string
+
+⸻
+
+10. Structuring Commands
+
+⸻
+
+table
+
+index=windowslogs | table _time User EventID SourceIp
+
+Explanation
+	•	Creates clean output
+	•	Best for:
+	•	Reports
+	•	Timelines
+
+⸻
+
+head / tail
+
+| head 10
+| tail 10
+
+	•	First / last events
+
+⸻
+
+sort
+
+| sort User
+
+
+⸻
+
+reverse
+
+| reverse
+
+
+⸻
+
+11. Timeline Example
+
+index=windowslogs Hostname=PC1
+| table _time EventID User
+| reverse
+
+→ Shows chronological activity
+
+⸻
+
+12. Transforming Commands
+
+⸻
+
+top
+
+index=windowslogs | top Image
+
+	•	Most frequent values
+
+⸻
+
+rare
+
+| rare User
+
+	•	Least frequent
+
+⸻
+
+stats (VERY IMPORTANT)
+
+index=windowslogs | stats count by User
+
+Functions
+	•	count
+	•	avg
+	•	max
+	•	min
+	•	sum
+
+⸻
+
+Example
+
+| stats count by EventID
+
+
+⸻
+
+chart
+
+| chart count by User
+
+→ Visualization-ready
+
+⸻
+
+timechart
+
+| timechart span=30m count by Image
+
+→ Trend over time
+
+⸻
+
+13. Highlight
+
+| highlight User Image "failed"
+
+	•	Works in Raw view
+
+⸻
+
+14. Data Enrichment
+
+⸻
+
+iplocation
+
+| iplocation SourceIp
+| stats count by Country
+
+
+⸻
+
+lookup
+
+| lookup user_roles Hostname OUTPUT Role
+
+
+⸻
+
+eval (CRITICAL)
+
+| eval LogonTypeDesc=case(
+    LogonType==2,"Interactive",
+    LogonType==3,"Network"
+)
+
+Explanation
+	•	Creates new field
+	•	Adds meaning to data
+
+⸻
+
+15. Subsearch + Join
+
+index=windowslogs EventID=4688
+| join LogonId
+    [ search index=windowslogs EventID=4624
+    | rename TargetLogonId as LogonId
+    | fields LogonId LogonType SourceIp ]
+| table Image User LogonType SourceIp
+
+Explanation
+	•	Correlates:
+	•	Process creation
+	•	Logon event
+
+⸻
+
+16. Anomaly Detection (IMPORTANT)
+
+⸻
+
+Country Outlier
+
+index=vpnlogs
+| eventstats count as total by user
+| eventstats count as country_count by user src_country
+| eval freq=country_count/total
+| where freq < 0.1
+
+
+⸻
+
+Time Anomaly
+
+| eval hour=strftime(_time,"%H")
+| eventstats avg(hour) by user
+
+
+⸻
+
+17. Practical Detection Example
+
+index=windowslogs EventID=4624 LogonType=10 AccountName!=SYSTEM
+| stats count by AccountName SourceIp
+| sort - count
+
+Detects:
+	•	RDP logins
+	•	Suspicious IP patterns
+
+⸻
+
+18. Analyst Notes (REAL WORLD)
+	•	Always:
+	•	Start broad → narrow down
+	•	Use:
+	•	fields → reduce noise
+	•	table → readability
+	•	stats → analysis
+
+⸻
+
+19. Quick Revision
+
+Operators
+	•	= match
+	•	!= exclude
+	•	AND / OR logic
+	•	* wildcard
+
+⸻
+
+Commands
+	•	table → display
+	•	stats → analyze
+	•	top → most common
+	•	eval → create fields
+	•	regex → pattern match
+
+⸻
+
+20. Key Mindset
+
+Splunk is:
+	•	Search → Filter → Transform → Analyze
