@@ -1,0 +1,171 @@
+SPLUNK SETUP NOTES
+==================
+
+========================================
+1. Splunk Enterprise -- Install & Start
+========================================
+
+  cd ~/Downloads/splunk
+  sudo su
+  tar xvzf splunk_installer.tgz -C /opt
+
+  cd /opt/splunk/bin
+  ./splunk start --accept-license
+  # Creates admin account on first run
+  # Web UI available at http://<HOST>:8000
+
+
+========================================
+2. Key Splunk CLI Commands
+========================================
+
+  # All run from: /opt/splunk/bin/
+
+  ./splunk start                          # Start Splunk
+  ./splunk stop                           # Stop Splunk
+  ./splunk restart                        # Restart (apply config changes)
+  ./splunk status                         # Check if splunkd is running (shows PID)
+  ./splunk enable boot-start             # Auto-start Splunk on system boot
+
+  ./splunk add oneshot /path/to/log -index <indexname>   # Add single log event
+  ./splunk search <keyword>              # CLI search
+  ./splunk help                          # All available commands
+  ./splunk help commands
+
+
+========================================
+3. Splunk UI Configuration
+========================================
+
+  Enable Data Receiving (Indexer Side):
+    Settings -> Forwarding and Receiving -> Receive Data -> + Add New
+    Port: 9997  (default forwarder-to-indexer port)
+    Save
+
+  Create a New Index:
+    Settings -> Indexes -> New Index
+    Index Name: linux_host  (or web, windows, etc.)
+    Keep defaults -> Save
+
+  NOTE: If no index is specified, data goes to the default "main" index.
+
+
+========================================
+4. Universal Forwarder -- Install & Start
+========================================
+
+  # From the same Downloads directory (as root)
+  tar xvzf splunkforwarder.tgz -C /opt
+
+  cd /opt/splunkforwarder/bin
+  ./splunk start --accept-license
+  # Creates forwarder admin credentials
+
+  PORT CONFLICT NOTE (if running both on same machine):
+  Splunk Enterprise uses mgmt port 8089 by default.
+  Forwarder will prompt to change port -- use 8090.
+
+
+========================================
+5. Forwarder Configuration
+========================================
+
+  Point forwarder at the indexer:
+    ./splunk add forward-server <SPLUNK_IP>:9997
+    # Prompts for forwarder admin credentials
+    # Output: "Added forwarding to: <IP>:9997"
+
+  Add a log source to monitor:
+    ./splunk add monitor /path/to/logfile -index <indexname>
+
+    # Examples:
+    ./splunk add monitor /var/log/syslog -index linux_host
+    ./splunk add monitor /var/log/apache2/access.log -index web
+
+  Verify inputs.conf:
+    cat /opt/splunkforwarder/etc/apps/search/local/inputs.conf
+
+    Expected output:
+      [monitor:///var/log/syslog]
+      disabled = false
+      index = linux_host
+
+
+========================================
+6. Common Linux Log Locations
+========================================
+
+  ls /var/log
+
+  syslog          -- General system messages
+  auth.log        -- Authentication events (SSH, sudo)
+  kern.log        -- Kernel messages
+  apache2/        -- Web server logs (access.log, error.log)
+  samba/          -- SMB/file share logs
+  dpkg.log        -- Package install/remove history
+
+
+========================================
+7. Testing -- Generate a Test Log Entry
+========================================
+
+  # Write a custom test message to syslog
+  logger "coffely-has-the-best-coffee-in-town"
+
+  # Verify it was written
+  tail -1 /var/log/syslog
+  # -> 2025-11-06T05:37:11 coffely root: coffely-has-the-best-coffee-in-town
+
+  Search in Splunk UI:
+    index=linux_host "coffely-has-the-best-coffee-in-town"
+
+
+========================================
+8. Adding Data via Splunk UI (Apache Example)
+========================================
+
+  Settings -> Add Data -> Monitor -> File & Directories
+  File path:        /var/log/apache2/access.log
+  Source Type:      Web -> access_combined
+  Host field value: coffelyweb
+  Index:            web
+  -> Review -> Submit
+
+
+========================================
+9. Windows Log Forwarding (Reference)
+========================================
+
+  From Windows host (PowerShell):
+    cd "C:\Program Files\SplunkUniversalForwarder\bin"
+    .\splunk.exe add monitor C:\Windows\System32\winevt\Logs\Security.evtx
+
+  Enable Deployment Server (manage forwarders remotely via UI):
+    ./splunk enable deploy-server
+    ./splunk restart
+    Then: Settings -> Data Inputs -> Forwarded Inputs -> Windows Event Logs -> + Add New
+
+
+========================================
+10. Port Reference
+========================================
+
+  8000   Splunk Web UI (browser access)
+  8089   splunkd management -- Enterprise (CLI / API)
+  8090   splunkd management -- Forwarder (changed to avoid conflict)
+  9997   Forwarder -> Indexer data forwarding (default)
+  8191   KV Store (internal)
+  8065   App Server (internal)
+
+
+========================================
+11. Quick SPL Reference
+========================================
+
+  index=linux_host                                  -- search entire index
+  index=linux_host "some keyword"                   -- keyword search
+  index=linux_host source="/var/log/syslog"         -- filter by source file
+  index=web host="coffelyweb"                       -- filter by host
+  index=linux_host earliest=-24h latest=now         -- last 24 hours
+
+
