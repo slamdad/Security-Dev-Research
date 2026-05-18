@@ -1,0 +1,203 @@
+# Python Object-Oriented Programming (OOP) Core Reference
+
+## 1. Classes vs. Objects
+
+* **Class:** A blueprint, template, or user-defined data type that defines the structure (attributes) and behaviors (methods) that objects created from it will possess. You write a class once.
+* **Object (Instance):** An individual instance created from a class blueprint. It holds actual data in its attributes and can execute the behaviors defined by the class. You can create many unique objects from a single class.
+
+### Code Example
+
+```python
+# The Blueprint (Class)
+class Dog:
+    # Initializer / Constructor
+    def __init__(self, name, age):
+        self.name = name  # Instance attribute
+        self.age = age    # Instance attribute
+
+    # Behavior (Method)
+    def bark(self):
+        print(f"{self.name.upper()} says woof woof! I'm {self.age} years old!")
+
+# The Real-World Instances (Objects)
+dog_1 = Dog("Jack", 3)
+dog_2 = Dog("Thatcher", 5)
+
+# Executing behaviors utilizing unique instance data
+dog_1.bark()  # Output: JACK says woof woof! I'm 3 years old!
+dog_2.bark()  # Output: THATCHER says woof woof! I'm 5 years old!
+
+```
+
+---
+
+## 2. Attributes and Methods
+
+* **Attributes:** Variables bound to a class or an instance used to store state or data.
+* *Instance Attributes:* Unique to each specific object. Usually defined inside the `__init__` method using `self`.
+* *Class Attributes:* Belong to the class itself. Shared globally by all instances of that class.
+
+
+* **Methods:** Functions defined inside a class that describe the actions an object can perform. They can read or modify the object's internal data.
+* **Dot Notation:** The syntax (`object.attribute` or `object.method()`) used to access data and behaviors.
+
+### Code Example
+
+```python
+class Car:
+    # Class Attribute (Shared by all cars)
+    wheels = 4 
+
+    def __init__(self, color, model):
+        # Instance Attributes (Unique to each car)
+        self.color = color  
+        self.model = model  
+
+    # Regular Method
+    def describe(self):
+        return f"This car is a {self.color} {self.model} with {self.wheels} wheels."
+
+# Accessing Class Attribute directly from the Class
+print(Car.wheels) # Output: 4
+
+# Creating instances
+car_1 = Car("red", "Toyota Corolla")
+car_2 = Car("green", "Lamborghini Revuelto")
+
+print(car_1.describe()) # Output: This car is a red Toyota Corolla with 4 wheels.
+print(car_2.describe()) # Output: This car is a green Lamborghini Revuelto with 4 wheels.
+
+```
+
+---
+
+## 3. Special (Magic / Dunder) Methods
+
+Special methods begin and end with double underscores (`__`). They are not typically called directly. Instead, the Python interpreter automatically invokes them under the hood when specific operations or built-in functions (like `+`, `==`, `len()`, `str()`, or loops) are executed on your custom objects.
+
+### Core Categories & Mapping
+
+* **Initialization:** `__init__` sets up an object upon creation.
+* **Arithmetic:** `+` maps to `__add__`, `-` to `__sub__`, `*` to `__mul__`.
+* **Comparison:** `==` maps to `__eq__`, `<` to `__lt__`, `>` to `__gt__`.
+* **String Representation:** `str()` maps to `__str__` (user-friendly display).
+* **Collections/Iteration:** `len()` maps to `__len__`, `in` maps to `__contains__`, indexing `obj[i]` maps to `__getitem__`, and loops map to `__iter__` / `__next__`.
+
+### Code Example (Book & Shopping Cart Implementation)
+
+```python
+class Book:
+    def __init__(self, title, pages):
+        self.title = title
+        self.pages = pages
+
+    # Defines behavior for len(book_obj)
+    def __len__(self):
+        return self.pages
+
+    # Defines behavior for str(book_obj) or print(book_obj)
+    def __str__(self):
+        return f"'{self.title}' ({self.pages} pages)"
+
+    # Defines behavior for equality checks (book1 == book2)
+    def __eq__(self, other):
+        return self.pages == other.pages
+
+book1 = Book("Build Wealth Like a Boss", 420)
+book2 = Book("Be Your Own Star", 420)
+
+print(len(book1))     # Output: 420
+print(str(book1))     # Output: 'Build Wealth Like a Boss' (420 pages)
+print(book1 == book2) # Output: True (Evaluates based on page counts, not memory address)
+
+
+class Cart:
+    def __init__(self):
+        self.items = []
+
+    def add(self, item):
+        self.items.append(item)
+
+    # Collection Dunder Methods
+    def __len__(self):
+        return len(self.items)
+
+    def __getitem__(self, index):
+        return self.items[index]
+
+    def __contains__(self, item):
+        return item in self.items
+
+    def __iter__(self):
+        return iter(self.items)
+
+# Usage
+cart = Cart()
+cart.add('Laptop')
+cart.add('Monitor')
+
+print(len(cart))          # Output: 2 (via __len__)
+print(cart[1])            # Output: Monitor (via __getitem__)
+print('Laptop' in cart)   # Output: True (via __contains__)
+
+for item in cart:         # Works via __iter__
+    print(item)
+
+```
+
+---
+
+## 4. Dynamic Attribute Handling
+
+When building flexible programs (such as processing configuration files, environment variables, or dynamic user inputs), you might not know attribute names when writing the code. Python provides built-in reflection utilities to inspect and manipulate object state dynamically at runtime.
+
+### Built-in Functions
+
+* `getattr(object, "name", default)`: Reads an attribute using a string name. Returns an optional default value if the attribute is missing to prevent an `AttributeError`.
+* `setattr(object, "name", value)`: Dynamically assigns a value to an existing attribute or creates a brand-new one.
+* `hasattr(object, "name")`: Returns `True` or `False` if an attribute exists. Used as a safe check before reading or modifying data.
+* `delattr(object, "name")`: Permanently deletes an attribute from an instance.
+* `dir(object)`: Returns a list of all strings representing attributes and methods attached to the object.
+
+### Code Example (Dynamic Session Management & Processing)
+
+```python
+class UserSession:
+    def __init__(self, user_id, token):
+        self.user_id = user_id
+        self.auth_token = token
+        self.temp_counter = 0
+
+session = UserSession(101, 'a1b2c3d4e5')
+
+# 1. Dynamic Reading with getattr() via Runtime Variables
+requested_field = "user_id"
+print(getattr(session, requested_field)) # Output: 101
+print(getattr(session, "ip_address", "127.0.0.1")) # Output: 127.0.0.1 (Safely falls back to default)
+
+# 2. Dynamic Modification / Creation with setattr()
+setattr(session, "role", "admin") # Adds a brand new attribute at runtime
+print(session.role) # Output: admin
+
+# 3. Dynamic Validation and Cleanup with hasattr() & delattr()
+sensitive_fields = ['auth_token', 'temp_counter']
+
+for attr in sensitive_fields:
+    if hasattr(session, attr):
+        delattr(session, attr)
+        print(f"Purged: {attr}")
+
+print("\n--- Remaining Non-Private Attributes ---")
+# 4. Inspection with dir()
+for attr in dir(session):
+    # Filter out system dunder methods and callable functions/methods
+    if not attr.startswith('__') and not callable(getattr(session, attr)):
+        print(f"Field -> {attr}: {getattr(session, attr)}")
+
+# Final Output:
+# Purged: auth_token
+# Purged: temp_counter
+# 
+# --- Remaining Non-Private Attributes ---
+# Field -> role: admin
+# Field -> user_id: 101
